@@ -1,0 +1,36 @@
+<cu-custom bgColor="bg-gradual-pink" isBack="{{true}}">
+	<view slot="backText">返回</view>
+	<view slot="content">签到页</view>
+</cu-custom>
+
+
+<view class='box'>
+  <view class="cu-bar tabbar bg-white nav"role=""aria-label="">
+    <view class="action"role=""aria-label="">
+      <view class="cuIcon-cu-image"role=""aria-label="">
+        <image src="/images/tabbar/basics_cur.png"></image>
+      </view>
+      <view class="text-green"role=""aria-label="">开始签到</view>
+    </view>
+    <view class="action"role=""aria-label="">
+      <view class="cuIcon-cu-image"role=""aria-label="">
+        <image src="/images/tabbar/component.png"></image>
+      </view>
+      <view class="text-gray"role=""aria-label="">我的课程</view>
+    </view>
+    <view class="action"role=""aria-label="">
+      <view class="cuIcon-cu-image"role=""aria-label="">
+        <image src="/images/tabbar/plugin.png"></image>
+        <view class="cu-tag badge"role=""aria-label="">99</view>
+      </view>
+      <view class="text-gray"role=""aria-label="">校园导航</view>
+    </view>
+    <view class="action"role=""aria-label="">
+      <view class="cuIcon-cu-image"role=""aria-label="">
+        <image src="/images/tabbar/about.png"></image>
+        <view class="cu-tag badge"role=""aria-label=""></view>
+      </view>
+      <view class="text-gray"role=""aria-label="">个人中心</view>
+    </view>
+  </view>
+</view>
