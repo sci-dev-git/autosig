@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "sign": "/pages/sign/home/home",
+    "schedule": "/pages/schedule/home/home",
+    "navigator": "/pages/navigator/home/home",
+    "center": "/pages/center/home/home"
+  }
+}
