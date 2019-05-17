@@ -11,9 +11,11 @@ Page({
     motto: '欢迎进入独步校园！',
     userInfo: {},
     hasUserInfo: false,
-    code: '',
-    hasCode: false,
+    openId: null,
+    hasOpenId: false,
+    loginState: 0,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
+    place: '',
     userCode: '',
     userName: ''
   },
@@ -51,21 +53,37 @@ Page({
       })
     }
 
-    if (app.globalData.code) {
+    // 获取从app.js返回的openid
+    if (app.globalData.openId) {
       this.setData({
-        code: app.globalData.code,
-        hasCode: true
+        openId: app.globalData.openId,
+        loginState: app.globalData.loginState,
+        hasOpenId: true
       })
-    } else if (this.data.canIUse) {
-      // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
+      this.openIdAcquired()
+    } else {
+      // 由于 login 是网络请求，可能会在 Page.onLoad 之后才返回
       // 所以此处加入 callback 以防止这种情况
-      app.codeReadyCallback = res => {
+      app.openIdReadyCallback = () => {
         this.setData({
-          code: res.code,
-          hasCode: true
+          openId: app.globalData.openId,
+          loginState: app.globalData.loginState,
+          hasOpenId: true
         })
+        this.openIdAcquired()
       }
     }
+  },
+  openIdAcquired: function () { //获取到openId时被调用
+    if (this.data.loginState == 1) {
+      // 无需绑定
+      this.gotoMainPage()
+    }
+  },
+  gotoMainPage: function() { // 跳转到主页面
+    wx.redirectTo({
+      url: '../index/index',
+    })
   },
   getUserInfo: function(e) {
     console.log(e)
@@ -76,37 +94,43 @@ Page({
     })
   },
   logbtn: function(options){
+    var err = null
+    if (!this.data.userCode.length)
+      err = '证件号不能为空！'
+    else if (!this.data.userName.length)
+      err = '姓名不能为空！'
+    if (err != null) {
+      wx.showModal({
+        title: '输入错误',
+        content: err,
+        showCancel: false
+      })
+      return
+    }
     var api = require('../../utils/autosig-apis')
-    api.reg(this.data.code,
-            this.data.place,
-            this.data.userCode,
-            this.data.userName,
+    var _this = this
+    api.reg(
+      this.data.openId,
+      this.data.place,
+      this.data.userCode,
+      this.data.userName,
 
-            function(err) {
-              console.log(err)
-              if(err.code == 0) {
-                wx.redirectTo({
-                  url: '../index/index',
-                })
-              } else {
-                wx.showModal({
-                  title: '绑定',
-                  content: '绑定失败',
-                })
-              }
-            }
-    ) 
-    
-
+      function(status, data) {
+        if(status.code == 0) {
+          _this.gotoMainPage()
+        } else {
+          api.showError(status)
+        }
+      })
   },
   bindUserCodeInput(e){
     this.setData({
-      userCode:e.detail.value
+      userCode:e.detail.value.trim()
     })
   },
   bindUserNameInput(e){
     this.setData({
-      userName:e.detail.value
+      userName:e.detail.value.trim()
     })
   }
 })

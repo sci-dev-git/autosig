@@ -7,13 +7,31 @@ App({
     wx.setStorageSync('logs', logs)
 
     // 登录
+    this.globalData.loginState = 0
     wx.login({
       success: res => {
         // 发送 res.code 到后台换取 openId, sessionKey, unionId
-        this.globalData.code = res.code
-        if (this.codeReadyCallback) {
-          this.codeReadyCallback(res)
-        }
+        var api = require('/utils/autosig-apis')
+        var _this = this
+        api.login(
+          res.code,
+          function(status, data) {
+            switch (status.msg) {
+              case 'E_OK':
+                // 成功登陆 发送openId到后台
+                _this.globalData.loginState = 1
+              case 'E_USER_NON_EXISTING':
+                // 用户不存在, 请求绑定. 发送openId到后台
+                _this.globalData.openId = data.openId
+                break;
+              default:
+                _this.globalData.loginState = 2
+                api.showError(status)
+            }
+            if (_this.openIdReadyCallback) {
+              _this.openIdReadyCallback()
+            }
+          })
       }
     })
     // 获取用户信息
@@ -48,6 +66,7 @@ App({
   },
   globalData: {
     userInfo: null,
-    code: null
+    openId: null,
+    loginState: 0, // 0 = not login, 1 = login, 2 = error
   }
 })

@@ -16,19 +16,110 @@
 const app = getApp()
 
 const apiHost = "https://autosigs.applinzi.com";
+//const apiHost = "http://localhost:5050"; // for debug
 
-module.exports.reg = function (jscode, place, code, name, callback) {
+function requestAPI(url, callback) {
   wx.request({
-    url: `${apiHost}/usr/reg?wxcode=${jscode}&place=${place}&code=${code}&real_name=${name}`,
+    url: url,
     success: function (res) {
-      var responseObj = res.data;
-      if (responseObj.status.code)
-        callback(responseObj.status, null);
-      else
+      try {
+        var responseObj = res.data;
+        if (responseObj == null || responseObj.status == null) {
+          throw(false)
+        }
+        if (responseObj.status.code) { // an error has been occured
+          var msg = responseObj.status.msg
+          var code = responseObj.status.code
+          console.warn('autosig-api: server returns: msg = '+msg+', code = '+code)
+        }
         callback(responseObj.status, responseObj.data);
+      } catch(e) {
+        console.warn('autosig-api: server returns invalid data.')
+        callback({ "code": -2, "msg": "E_NETWORK" }, null)
+      }
     },
     fail: function (res) {
-      callback({"code":-1,"msg":""}, null);
+      callback({ "code": -1, "msg": "E_NETWORK" }, null);
     }
   });
+}
+
+function throwParamCheckError(callback) {
+  callback({ "code": -2, "msg": "E_INTERNAL" }, null)
+  console.error('autosig-api: null parameetrs given in API calling!')
+}
+
+/**
+ * 用户注册接口
+ * @param openid
+ * @param place 学校
+ * @param code 证件号
+ * @param name 姓名
+ */
+module.exports.reg = function (openid, place, code, name, callback) {
+  if (openid == null || place == null || code == null || name == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/usr/reg?openid=${openid}&place=${place}&code=${code}&real_name=${name}`, callback);
+}
+
+/**
+ * 用户登陆接口
+ * @param jscode
+ * @return 成功：data.token: 用于内部认证的唯一凭证。
+ *              data.openid: 获取从微信服务器获取到的openid
+ *        失败：返回错误代码。
+ */
+module.exports.login = function (jscode, callback) {
+  if (jscode == null) {
+    throwParamCheckErrorr(callback)
+    return
+  }
+  requestAPI(`${apiHost}/usr/login?wxcode=${jscode}`, callback)
+}
+
+/**
+ * 通过showToast显示来自服务器的错误消息
+ * @param status 回调函数中的错误信息
+ */
+module.exports.showError = function(status) {
+  var err
+  switch(status.msg) {
+    case 'E_FAULT':
+      err = '操作失败'; break;
+    case 'E_SERVER_FAULT':
+      err = '服务正忙'; break;
+    case 'E_TOKEN_AUTH':
+      err = '验证失败'; break;
+    case 'E_USER_EXISTING':
+      err = '用户已存在'; break;
+    case 'E_USER_NON_EXISTING':
+      err = '用户不存在'; break;
+    case 'E_PERMISSION_DENIED':
+      err = '权限不足'; break;
+    case 'E_GROUP_EXISTING':
+      err = '群组已存在'; break;
+    case 'E_GROUP_NON_EXISTING':
+      err = '群组不存在'; break;
+    case 'E_ACTIVITY_EXISTING':
+      err = '活动已存在'; break;
+    case 'E_ACTIVITY_NON_EXISTING':
+      err = '活动不存在'; break;
+    case 'E_TASK_EXISTING':
+      err = '任务已存在'; break;
+    case 'E_TASK_NON_EXISTING':
+      err = '任务不存在'; break;
+    case 'E_ASSET_NOT_FOUND':
+      err = '资源未找到'; break;
+    case 'E_NETWORK':
+      err = '连接失败'; break;
+    default:
+      err = '操作失败'; break;
+  }
+  wx.showModal({
+    title: err,
+    content: '请稍后重试！',
+    showCancel: false
+  })
 }
