@@ -1,1 +1,3 @@
-/* pages/begin/begin.wxss */
+.transparent{
+  background-color: transparent;
+}

@@ -12,11 +12,33 @@
     </block>
   </view>
 </view>
+<view class="cu-form-group margin-top">
+		<view class="title">学校</view>
+		<picker bindchange="PickerChange" value="{{index}}" range="{{sch_names}}">
+			<view class="picker">
+				{{index?sch_names[index]:cur_sch}}
+			</view>
+		</picker>
+	</view>
+
+
+<view>
+  <view class="cu-form-group">
+    <view class="title">证件号</view>
+    <input placeholder="请输入证件号" bindinput="bindUserCodeInput"></input>
+  </view>
+  <view class="cu-form-group">
+    <view class="title">姓名</view>
+    <input placeholder="输入你的姓名" bindinput="bindUserNameInput"></input>
+  </view>
+</view>
+
 <view class="text-center margin-top">
   <text class="text-grey text-xl">{{motto}}</text>
 </view>
 
+
 <view class="margin-tb-sm text-center"role=""aria-label="">
   <button class="cu-btn round lines-mauve shadow size"role="button" 
-  aria-label="" aria-disabled="false" bindtap='logbtn'>    点击进入</button>
+  aria-label="" aria-disabled="false" bindtap='logbtn'>完成绑定</button>
 </view>
