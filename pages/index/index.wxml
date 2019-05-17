@@ -3,7 +3,6 @@
 <navigator wx:if="{{PageCur=='navigator'}}"></navigator>
 <center wx:if="{{PageCur=='center'}}"></center>
 
-
 <view class="cu-bar tabbar bg-white shadow foot ">
   <view class="action" bindtap="NavChange" data-cur="sign">
     <view class='cuIcon-cu-image'>
@@ -15,7 +14,7 @@
     <view class='cuIcon-cu-image'>
       <image src="/images/tabbar/schedule{{PageCur=='schedule'?'_cur':''}}.png"></image>
     </view>
-    <view class="{{PageCur=='schedule'?'text-green':'text-gray'}}">我的课程</view>
+    <view class="{{PageCur=='schedule'?'text-green':'text-gray'}}">我的群组</view>
   </view>
   <view class="action" bindtap="NavChange" data-cur="navigator">
     <view class='cuIcon-cu-image'>

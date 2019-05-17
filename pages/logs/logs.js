@@ -26,6 +26,10 @@ Page({
     })
   },
   onLoad: function () {
+    wx.showLoading({
+      title: '加载中',
+    })
+
     if (app.globalData.userInfo) {
       this.setData({
         userInfo: app.globalData.userInfo,
@@ -75,6 +79,7 @@ Page({
     }
   },
   openIdAcquired: function () { //获取到openId时被调用
+    wx.hideLoading()
     if (this.data.loginState == 1) {
       // 无需绑定
       this.gotoMainPage()
@@ -86,7 +91,6 @@ Page({
     })
   },
   getUserInfo: function(e) {
-    console.log(e)
     app.globalData.userInfo = e.detail.userInfo
     this.setData({
       userInfo: e.detail.userInfo,

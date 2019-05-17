@@ -2,7 +2,7 @@
   <view slot="content">Demo autosig</view>
 </cu-custom>
 <!-- 连接成功并确定用户未绑定后显示 -->
-<view wx:if="{{hasOpenId && loginState == 0}}">
+<block wx:if="{{hasOpenId && loginState == 0}}">
   <view class="margin-xl padding-xl bg-white radius shadow shadow-lg">
     <view class="flex justify-center">
       <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo" class='cu-btn round bg-green shadow'> 获取头像昵称 </button>
@@ -44,14 +44,14 @@
   <view wx:if="{{!hasUserInfo}}" class="text-center  margin-top">
     <text class="text-grey text-xl">{{motto}}请先进行用户登陆!</text>
   </view>
-</view>
+</block>
 <!-- 正在登陆或登陆失败时显示 -->
-<view wx:else>
+<block wx:else>
   <!-- 登陆失败不显示 -->
-  <view wx:if="{{!hasOpenId || loginState != 2}}">
-  </view>
+  <block wx:if="{{!hasOpenId || loginState != 2}}">
+  </block>
 
   <view class="text-center margin-top">
     <text class="text-grey text-xl">{{motto}}</text>
   </view>
-</view>
+</block>
