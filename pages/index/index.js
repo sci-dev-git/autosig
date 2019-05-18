@@ -7,9 +7,14 @@ Page({
   data: {
     PageCur: 'sign'
   },
-  NavChange(e) {
+  onNavChange(e) {
     this.setData({
       PageCur: e.currentTarget.dataset.cur
+    })
+  },
+  onGotogroup(e) {
+    this.setData({
+      PageCur: 'schedule'
     })
   },
   /**

@@ -5,9 +5,14 @@ Component({
   },
   data: {
     userInfo: null,
-    signProg: '30%'
+    attendedGroup:false
   },
   attached: function () {
     this.setData({userInfo: app.globalData.userInfo})
+  },
+  methods: {
+    onAddGroup() {
+      this.triggerEvent('gotogroup', {})
+    }
   }
 })
