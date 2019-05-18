@@ -11,7 +11,7 @@ App({
     wx.login({
       success: res => {
         // 发送 res.code 到后台换取 openId, sessionKey, unionId
-        var api = require('/utils/autosig-apis')
+        var api = require('/service/autosig-apis')
         var _this = this
         api.login(
           res.code,

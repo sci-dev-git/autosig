@@ -1,0 +1,47 @@
+<cu-custom bgColor="bg-gradual-blue">
+  <view slot="content">我的群组</view>
+</cu-custom>
+<view class='box'>
+  <view class="cu-bar justify-right bg-white">
+    <view class="action border-title">
+      <text class="text-xl text-bold text-blue">加入群组</text>
+      <text class="bg-gradual-blue" style="width:3rem"></text>
+    </view>
+  </view>
+
+  <view class="cu-bar bg-white search">
+    <view class="search-form">
+      <text class="cuIcon-search"></text>
+      <input type="text" placeholder="输入搜索的关键词" confirm-type="search"></input>
+    </view>
+    <view class="action">
+      <button class="cu-btn bg-gradual-blue shadow-blur">搜索</button>
+    </view>
+  </view>
+
+  <scroll-view scroll-y class="indexes" scroll-into-view="indexes-{{listCurID}}" style="height:calc(100vh - {{CustomBar}}px - 50px)" scroll-with-animation="true" enable-back-to-top="true">
+    <block wx:for="{{list}}" wx:key>
+      <view class="padding indexItem-{{list[index]}}" id="indexes-{{list[index]}}" data-index="{{list[index]}}">{{list[index]}}</view>
+      <view class="cu-list menu-avatar no-padding">
+        <view class="cu-item" wx:for="{{2}}" wx:key wx:for-index="sub">
+          <view class="cu-avatar round lg">{{list[index]}}</view>
+          <view class="content">
+            <view class="text-grey">{{list[index]}}
+              <text class="text-abc">{{list[sub]}}</text>
+            </view>
+            <view class="text-gray text-sm">
+              未知群组
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
+  </scroll-view>
+
+  <view class="cu-bar justify-right bg-white">
+    <view class="action border-title">
+      <text class="text-xl text-bold text-blue">创建群组</text>
+      <text class="bg-gradual-blue" style="width:3rem"></text>
+    </view>
+  </view>
+</view>

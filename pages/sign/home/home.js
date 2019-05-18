@@ -5,7 +5,10 @@ Component({
   },
   data: {
     userInfo: null,
-    attendedGroup:false
+    attendedGroup:false,
+    taskTotal: '--',
+    taskFinished: '--',
+    taskRatio: '---'
   },
   attached: function () {
     this.setData({userInfo: app.globalData.userInfo})

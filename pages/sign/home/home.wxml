@@ -4,7 +4,7 @@
 
 <view class='box'>
   <view class='UCenter-bg bg-gradual-blue'>
-    <!-- <image src='/images/bac-pic.png' class='bac-pic' ></image>  -->
+    <!-- <image src='/assets/bac-pic.png' class='bac-pic' ></image>  -->
     <view class="flex justify-center">
       <view class='text-center'>
         <view class="cu-avatar xl round solids" style="background-image:url({{userInfo.avatarUrl}})"></view>
@@ -15,17 +15,17 @@
     
   <view class="padding flex text-center text-grey bg-white shadow-warp infoSize">
     <view class="flex flex-sub flex-direction solid-right">
-      <view class="text-xxl text-orange">100</view>
+      <view class="text-xxl text-orange">{{taskTotal}}</view>
       <view class="margin-top-sm">
-        <text class="cuIcon-attentionfill"></text> 任务</view>
+        <text class="cuIcon-attentionfill"></text> 总任务</view>
     </view>
     <view class="flex flex-sub flex-direction solid-right">
-      <view class="text-xxl text-blue">200</view>
+      <view class="text-xxl text-blue">{{taskFinished}}</view>
       <view class="margin-top-sm">
-        <text class="cuIcon-favorfill"></text> 完成</view>
+        <text class="cuIcon-favorfill"></text> 完成任务</view>
     </view>
     <view class="flex flex-sub flex-direction">
-      <view class="text-xxl text-green">300</view>
+      <view class="text-xxl text-green">{{taskRatio}}</view>
       <view class="margin-top-sm">
         <text class="cuIcon-fork"></text> 比率</view>
     </view>
@@ -116,7 +116,7 @@
   </block>
   <block wx:else>
     <view class='goto-group'>
-      <image mode='top' src='/images/attendedGroup.png'></image>
+      <image mode='top' src='/assets/attendedGroup.png'></image>
       <text>哎呀，你还没有加入任何群组！</text>
       <view class="margin-tb-sm text-center"role=""aria-label="">
         <button class="cu-btn round lines-cyan shadow"role="button"aria-label=""aria-disabled="false" bindtap='onAddGroup'>加入群组</button>
