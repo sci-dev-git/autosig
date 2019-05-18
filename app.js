@@ -49,6 +49,9 @@ App({
               if (this.userInfoReadyCallback) {
                 this.userInfoReadyCallback(res)
               }
+              if (this.userInfoReadyCallback2) {
+                this.userInfoReadyCallback2(res)
+              }
             }
           })
         }
