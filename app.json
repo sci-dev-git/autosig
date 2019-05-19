@@ -3,7 +3,7 @@
     "pages/logs/logs",
     "pages/index/index",
     "pages/sign/home/home",
-    "pages/schedule/home/home",
+    "pages/groups/groups",
     "pages/navigator/home/home",
     "pages/center/home/home"
   ],

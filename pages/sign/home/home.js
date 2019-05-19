@@ -5,10 +5,19 @@ Component({
   },
   data: {
     userInfo: null,
-    attendedGroup:false
+    attendedGroup:false,
+    taskTotal: '--',
+    taskFinished: '--',
+    taskRatio: '---'
   },
   attached: function () {
-    this.setData({userInfo: app.globalData.userInfo})
+    if (app.globalData.userInfo) {
+      this.setData({userInfo: app.globalData.userInfo})
+    } else {
+      app.userInfoReadyCallback2 = res => {
+        this.setData({ userInfo: res.userInfo })
+      }
+    }
   },
   methods: {
     onAddGroup() {

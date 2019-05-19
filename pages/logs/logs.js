@@ -16,8 +16,8 @@ Page({
     loginState: 0,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
     place: '',
-    userCode: '',
-    userName: ''
+    userCode: '2018',
+    userName: 'AAA'
   },
   //事件处理函数
   bindViewTap: function() {
@@ -111,7 +111,7 @@ Page({
       })
       return
     }
-    var api = require('../../utils/autosig-apis')
+    var api = require('../../service/autosig-apis')
     var _this = this
     api.reg(
       this.data.openId,

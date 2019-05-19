@@ -8,7 +8,7 @@
 }
 
 .UCenter-bg {
-  /*background-image: url(https://image.weilanwl.com/color2.0/index.jpg);*/
+  /*background-image: url('');*/
   /*background-size: cover;*/
   height: 350rpx;
   display: flex;
@@ -59,6 +59,7 @@
   color: black;
 }
 
+/*
 .progBox{
   display: flex;
   justify-content: center;
@@ -73,6 +74,7 @@
   font-size: 27rpx;
   font-weight: bold;
 }
+*/
 
 .goto-group {
   display: flex;

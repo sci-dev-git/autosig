@@ -11,7 +11,7 @@ App({
     wx.login({
       success: res => {
         // 发送 res.code 到后台换取 openId, sessionKey, unionId
-        var api = require('/utils/autosig-apis')
+        var api = require('/service/autosig-apis')
         var _this = this
         api.login(
           res.code,
@@ -48,6 +48,9 @@ App({
               // 所以此处加入 callback 以防止这种情况
               if (this.userInfoReadyCallback) {
                 this.userInfoReadyCallback(res)
+              }
+              if (this.userInfoReadyCallback2) {
+                this.userInfoReadyCallback2(res)
               }
             }
           })
