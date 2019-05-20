@@ -19,13 +19,17 @@ App({
             switch (status.msg) {
               case 'E_OK':
                 // 成功登陆 发送openId到后台
+                _this.globalData.openId = data.openId
                 _this.globalData.loginState = 1
+                _this.globalData.token = data.token
+                break;
               case 'E_USER_NON_EXISTING':
                 // 用户不存在, 请求绑定. 发送openId到后台
                 _this.globalData.openId = data.openId
+                _this.globalData.loginState = 2
                 break;
               default:
-                _this.globalData.loginState = 2
+                _this.globalData.loginState = 3
                 api.showError(status)
             }
             if (_this.openIdReadyCallback) {
@@ -35,6 +39,7 @@ App({
       }
     })
     // 获取用户信息
+    this.globalData.authRequired = false
     wx.getSetting({
       success: res => {
         if (res.authSetting['scope.userInfo']) {
@@ -58,9 +63,9 @@ App({
             }
           })
         } else {
-          this.globalData.userInfoRequired = true //要求再次授权
-          if (this.userInfoReadyCallback2) {
-            this.userInfoReadyCallback2(res)
+          this.globalData.authRequired = true // 要求授权
+          if (this.userInfoReadyCallback) {
+            this.userInfoReadyCallback(res)
           }
         }
       }
@@ -78,7 +83,8 @@ App({
   globalData: {
     userInfo: null,
     openId: null,
-    loginState: 0, // 0 = not login, 1 = login, 2 = error
-    userInfoRequired: false // true=已经绑定，但是授权失效
+    token: null,
+    loginState: 0, // 0 = logining, 1 = login, 2 = not login, 3 = error
+    authRequired: false // true=要求授权
   }
 })

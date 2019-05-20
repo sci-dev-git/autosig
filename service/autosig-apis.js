@@ -15,8 +15,8 @@
 
 const app = getApp()
 
-const apiHost = "https://autosigs.applinzi.com";
-//const apiHost = "http://localhost:5050"; // for debug
+//const apiHost = "https://autosigs.applinzi.com";
+const apiHost = "http://localhost:5050"; // for debug
 
 function requestAPI(url, callback) {
   wx.request({
@@ -34,6 +34,7 @@ function requestAPI(url, callback) {
         }
         callback(responseObj.status, responseObj.data);
       } catch(e) {
+        console.warn(e)
         console.warn('autosig-api: server returns invalid data.')
         callback({ "code": -2, "msg": "E_NETWORK" }, null)
       }
@@ -118,8 +119,8 @@ module.exports.showError = function(status) {
       err = '操作失败'; break;
   }
   wx.showModal({
-    title: err,
-    content: '请稍后重试！',
+    title: '出错啦',
+    content: err,
     showCancel: false
   })
 }

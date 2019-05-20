@@ -1,2 +1,30 @@
 @import "colorui/main.wxss";
 @import "colorui/icon.wxss";
+
+.cu-list.grid.col-6>.cu-item:nth-child(6n):after
+.cu-list.grid.col-7>.cu-item:nth-child(7n):after {
+	border-right-width: 0
+}
+.grid.col-6.grid-square>view {
+	padding-bottom: calc((100% - 100rpx)/6);
+	height: 0;
+	width: calc((100% - 100rpx)/6);
+}
+.grid.col-6.grid-square>view:nth-child(6n){
+	margin-right: 0;
+}
+.grid.col-6>view {
+	width: 16.66%;
+}
+
+.grid.col-7.grid-square>view {
+	padding-bottom: calc((100% - 120rpx)/7);
+	height: 0;
+	width: calc((100% - 120rpx)/7);
+}
+.grid.col-7.grid-square>view:nth-child(7n){
+	margin-right: 0;
+}
+.grid.col-7>view {
+	width: 14.28%;
+}

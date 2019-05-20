@@ -1,6 +1,3 @@
-.sign{
-  height: 60%;
-}
 
 .box{
   width: 100%;
@@ -48,9 +45,13 @@
   z-index: -1;
 }
 
-.timeline-location {
+.sign-scroll-view {
   position: relative;
   top: -100rpx;
+  height: 100%;
+}
+
+.sign-timeline {
   background-color: rgba(0, 0, 0, 0);
 }
 
@@ -59,24 +60,9 @@
   color: black;
 }
 
-/*
-.progBox{
-  display: flex;
-  justify-content: center;
-}
-
-.progBox .progLong{
-  width:90%;
-  height: 35rpx;
-}
-
-.progBox .progLong P{
-  font-size: 27rpx;
-  font-weight: bold;
-}
-*/
-
 .goto-group {
+  position: relative;
+  top: -100rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -87,7 +73,7 @@
 }
 
 .goto-group text{
-  position: relative;
+  margin-top: 30rpx;
 }
 
 .goto-group button{
@@ -95,4 +81,38 @@
   top: 50rpx;
   width: 350rpx;
   height: 75rpx;
+}
+
+.toboBar {
+  margin-top:40rpx;
+}
+
+.mainNavi {
+  width:74%; /* 务必使用百分比 */
+  margin-left: 5rpx;
+}
+
+.toboBar-next {
+  width: 30rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.naviButtons {
+  width: 800rpx; /* 务必固定像素 */
+}
+
+.tl-button-profile {
+  /*display: flex;
+  flex-direction: column;
+  align-items: center;*/
+  width: 200rpx;
+  height: 70rpx;
+}
+
+.right-align {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
 }

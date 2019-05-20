@@ -4,125 +4,154 @@
 
 <view class='box'>
   <view class='UCenter-bg bg-gradual-blue'>
-    <!-- <image src='/assets/bac-pic.png' class='bac-pic' ></image>  -->
     <view class="flex justify-center">
-      <view class='text-center'>
-        <block wx:if="{{hasUserInfo && !userInfoRequied}}">
-          <view class="cu-avatar xl round solids" bindtap='onAvatarTap' style="background-image:url({{userInfo.avatarUrl}})"></view>
-          <view class="padding nickName">{{userInfo.nickName}}</view>
+
+        <block wx:if="{{hasUserInfo && !authRequired}}">
+          <view class='text-center'>
+            <view class="cu-avatar xl round solids" bindtap='onAvatarTap' style="background-image:url({{userInfo.avatarUrl}})"></view>
+            <view class="padding nickName">{{userInfo.nickName}}</view>
+          </view>
         </block>
-        <block wx:if="{{!hasUserInfo && !userInfoRequied}}">
+        <block wx:if="{{!hasUserInfo && !authRequired}}">
           <text>加载中……</text>
         </block>
-        <block wx:if="{{!hasUserInfo && userInfoRequied}}">
-          <button wx:if="{{canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo" class='cu-btn round bg-green shadow'> 获取头像昵称 </button>
+        <block wx:if="{{authRequired}}">
+          <view class='text-center'>
+            <image class="cu-avatar xl round solids" bindtap='onAvatarTap' src="/assets/avatar-default.png"></image>
+            <view class="padding nickName">游客，您好</view>
+          </view>
         </block>
-      </view>
+      
     </view>
   </view>
-    
-  <view class="padding flex text-center text-grey bg-white shadow-warp infoSize">
-    <view class="flex flex-sub flex-direction solid-right">
+  
+  <view class="flex text-center text-grey bg-white shadow-warp infoSize">
+    <view class="flex flex-sub flex-direction solid-right toboBar">
       <view class="text-xxl text-orange">{{taskTotal}}</view>
       <view class="margin-top-sm">
         <text class="cuIcon-attentionfill"></text> 总任务</view>
     </view>
-    <view class="flex flex-sub flex-direction solid-right">
-      <view class="text-xxl text-blue">{{taskFinished}}</view>
-      <view class="margin-top-sm">
-        <text class="cuIcon-favorfill"></text> 完成任务</view>
-    </view>
-    <view class="flex flex-sub flex-direction">
-      <view class="text-xxl text-green">{{taskRatio}}</view>
-      <view class="margin-top-sm">
-        <text class="cuIcon-fork"></text> 比率</view>
-    </view>
+    <scroll-view scroll-x class='mainNavi' bindscroll='onToolbarScroll'>
+      <view class="cu-list grid col-7 no-border naviButtons">
+        <view class="cu-item" wx:for="{{iconList}}" wx:key wx:if="{{index<7}}">
+          <view class="cuIcon-{{item.icon}} text-{{item.color}}">
+            <view class="cu-tag badge" wx:if="{{item.badge!=0}}">
+              <block wx:if="{{item.badge!=1}}">{{item.badge>99?"99+":item.badge}}</block>
+            </view>
+          </view>
+          <text>{{item.name}}</text>
+        </view>
+      </view>
+    </scroll-view>
+    <view class='toboBar-next'>{{toolbarForwardHint}}</view>
   </view>
 
-  <block wx:if="{{attendedGroup}}">
-    <view class="sign cu-timeline timeline-location">
-      <view class="cu-time font-size">今日任务</view>
-      <!--<view class='progBox'>
-        <view class="cu-progress round sm striped active progLong">
-          <view class="bg-green " style="width:{{signProg}};"><p>{{signProg}}</p>
-          </view>
-        </view>
-      </view>-->
-      <view class="cu-item cur cuIcon-noticefill">
-        <view class="content bg-green shadow-blur">
-          <text>8:00-10:00</text>   高等数学  行知楼C122
-        </view>
-      </view>
-      <view class="cu-item text-red cuIcon-attentionforbidfill">
-        <view class="content bg-red shadow-blur">
-          这是第一次，我家的铲屎官走了这么久。久到足足有三天！！
-        </view>
-      </view>
-      <view class="cu-item text-grey cuIcon-evaluate_fill">
-        <view class="content bg-grey shadow-blur">
-          这是第一次，我家的铲屎官走了这么久。
-        </view>
-      </view>
-      <view class="cu-item text-blue">
-        <view class="bg-blue content">
-          <text>20:00</text> 【月球】快件已到达月球，准备发往地球
-        </view>
-        <view class="bg-cyan content">
-          <text>10:00</text> 【银河系】快件已到达银河系，准备发往月球
-        </view>
-      </view>
-      <view class="cu-item text-blue">
-        <view class="bg-blue content">
-          <text>20:00</text> 【月球】快件已到达月球，准备发往地球
-        </view>
-        <view class="bg-cyan content">
-          <text>10:00</text> 【银河系】快件已到达银河系，准备发往月球
-        </view>
-      </view>
-      <view class="cu-item text-blue">
-        <view class="bg-blue content">
-          <text>20:00</text> 【月球】快件已到达月球，准备发往地球
-        </view>
-        <view class="bg-cyan content">
-          <text>10:00</text> 【银河系】快件已到达银河系，准备发往月球
-        </view>
-      </view>
-      <view class="cu-item text-blue">
-        <view class="bg-blue content">
-          <text>20:00</text> 【月球】快件已到达月球，准备发往地球
-        </view>
-        <view class="bg-cyan content">
-          <text>10:00</text> 【银河系】快件已到达银河系，准备发往月球
-        </view>
-      </view>
-      <view class="cu-item text-blue">
-        <view class="bg-blue content">
-          <text>20:00</text> 【月球】快件已到达月球，准备发往地球
-        </view>
-        <view class="bg-cyan content">
-          <text>10:00</text> 【银河系】快件已到达银河系，准备发往月球
-        </view>
-      </view>
-      <view class="cu-item text-blue">
-        <view class="bg-blue content">
-          <text>20:00</text> 【月球】快件已到达月球，准备发往地球
-        </view>
-        <view class="bg-cyan content">
-          <text>10:00</text> 【银河系】快件已到达银河系，准备发往月球
-        </view>
-      </view>
-      <view class="cu-item text-blue">
-        <view class="bg-blue content">
-          <text>20:00</text> 【月球】快件已到达月球，准备发往地球
-        </view>
-        <view class="bg-cyan content">
-          <text>10:00</text> 【银河系】快件已到达银河系，准备发往月球
-        </view>
-      </view>
-
-    </view>
+  <block wx:if="{{loginState == 0}}">
   </block>
-  <block wx:else>
+  <block wx:if="{{loginState == 1 && attendedGroup || loginState == 2 }}">
+    <scroll-view scroll-y class='sign-scroll-view'>
+      <view class="cu-timeline sign-timeline">
+        <view class="cu-time font-size">今日任务</view>
+        
+        <block wx:if="{{loginState == 1 && attendedGroup}}">
+          <view class="cu-item cur cuIcon-noticefill">
+            <view class="content bg-green shadow-blur">
+              <text>8:00-10:00</text>   高等数学  行知楼C122
+            </view>
+          </view>
+          <view class="cu-item text-red cuIcon-attentionforbidfill">
+            <view class="content bg-red shadow-blur">
+              这是第一次，我家的铲屎官走了这么久。久到足足有三天！！
+            </view>
+          </view>
+          <view class="cu-item text-grey cuIcon-evaluate_fill">
+            <view class="content bg-grey shadow-blur">
+              这是第一次，我家的铲屎官走了这么久。
+            </view>
+          </view>
+          <view class="cu-item text-blue">
+            <view class="bg-blue content">
+              <text>20:00</text> 【月球】快件已到达月球，准备发往地球
+            </view>
+            <view class="bg-cyan content">
+              <text>10:00</text> 【银河系】快件已到达银河系，准备发往月球
+            </view>
+          </view>
+          <view class="cu-item text-blue">
+            <view class="bg-blue content">
+              <text>20:00</text> 【月球】快件已到达月球，准备发往地球
+            </view>
+            <view class="bg-cyan content">
+              <text>10:00</text> 【银河系】快件已到达银河系，准备发往月球
+            </view>
+          </view>
+          <view class="cu-item text-blue">
+            <view class="bg-blue content">
+              <text>20:00</text> 【月球】快件已到达月球，准备发往地球
+            </view>
+            <view class="bg-cyan content">
+              <text>10:00</text> 【银河系】快件已到达银河系，准备发往月球
+            </view>
+          </view>
+          <view class="cu-item text-blue">
+            <view class="bg-blue content">
+              <text>20:00</text> 【月球】快件已到达月球，准备发往地球
+            </view>
+            <view class="bg-cyan content">
+              <text>10:00</text> 【银河系】快件已到达银河系，准备发往月球
+            </view>
+          </view>
+          <view class="cu-item text-blue">
+            <view class="bg-blue content">
+              <text>20:00</text> 【月球】快件已到达月球，准备发往地球
+            </view>
+            <view class="bg-cyan content">
+              <text>10:00</text> 【银河系】快件已到达银河系，准备发往月球
+            </view>
+          </view>
+          <view class="cu-item text-blue">
+            <view class="bg-blue content">
+              <text>20:00</text> 【月球】快件已到达月球，准备发往地球
+            </view>
+            <view class="bg-cyan content">
+              <text>10:00</text> 【银河系】快件已到达银河系，准备发往月球
+            </view>
+          </view>
+          <view class="cu-item text-blue">
+            <view class="bg-blue content">
+              <text>20:00</text> 【月球】快件已到达月球，准备发往地球
+            </view>
+            <view class="bg-cyan content">
+              <text>10:00</text> 【银河系】快件已到达银河系，准备发往月球
+            </view>
+          </view>
+        </block>
+        
+        <block wx:if="{{loginState == 2}}">
+          <view class="cu-time">14:00</view>
+          <view class="cu-item">
+            <view class="bg-cyan radius shadow-blur content">
+              <view class="cu-capsule radius">
+                <view class="cu-tag bg-gray">系统消息</view>
+                <view class="cu-tag line-white">完善个人信息</view>
+              </view>
+              
+              <view class='margin-top margin-right'>欢迎来到“独步校园”。我们将为您提供最简洁的校园信息服务。若要开始，请先完善个人信息。</view>
+              <view class='right-align'>
+                <view>
+                  <button class="bg-cyan.light cuIcon-profile radius shadow tl-button-profile" open-type="getUserInfo" bindgetuserinfo="onGotoRegister"> 去完善</button>
+                </view>
+              </view>
+
+            </view>
+          </view>
+        </block>
+
+      </view>
+    </scroll-view>
+  </block>
+
+  <block wx:if="{{loginState == 1 && !attendedGroup}}">
     <view class='goto-group'>
       <image mode='top' src='/assets/attendedGroup.png'></image>
       <text>哎呀，你还没有加入任何群组！</text>

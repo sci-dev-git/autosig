@@ -1,57 +1,39 @@
-<cu-custom bgColor="bg-gradual-blue">
-  <view slot="content">Demo autosig</view>
+<cu-custom bgColor="bg-gradual-blue" isBack='true'>
+  <view slot="content">完善个人信息</view>
+  <view slot="backText">返回</view>
 </cu-custom>
-<!-- 连接成功并确定用户未绑定后显示 -->
-<block wx:if="{{hasOpenId && loginState == 0}}">
-  <view class="margin-xl padding-xl bg-white radius shadow shadow-lg">
-    <view class="flex justify-center">
-      <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo" class='cu-btn round bg-green shadow'> 获取头像昵称 </button>
-      <block wx:else>
-        <view class='text-center'>
-          <view class="cu-avatar xl round solids" style="background-image:url({{userInfo.avatarUrl}})"></view>
-          <view class="padding">{{userInfo.nickName}}</view>
-        </view>
-      </block>
-    </view>
-  </view>
-  <view wx:if="{{hasUserInfo}}">
-    <view class="cu-form-group margin-top">
-      <view class="title">学校</view>
-      <picker bindchange="PickerChange" value="{{index}}" range="{{sch_names}}">
-        <view class="picker">
-          {{index?sch_names[index]:cur_sch}}
-        </view>
-      </picker>
-    </view>
-    <view>
-      <view class="cu-form-group">
-        <view class="title">证件号</view>
-        <input placeholder="请输入证件号" bindinput="bindUserCodeInput"></input>
-      </view>
-      <view class="cu-form-group">
-        <view class="title">姓名</view>
-        <input placeholder="输入你的姓名" bindinput="bindUserNameInput"></input>
-      </view>
-    </view>
-    <view class="text-center margin-top">
-      <text class="text-grey text-xl">{{motto}}</text>
-    </view>
-    <view class="margin-tb-sm text-center"role=""aria-label="">
-      <button class="cu-btn round lines-mauve shadow size"role="button" 
-      aria-label="" aria-disabled="false" bindtap='logbtn'>完成绑定</button>
-    </view>
-  </view>
-  <view wx:if="{{!hasUserInfo}}" class="text-center  margin-top">
-    <text class="text-grey text-xl">{{motto}}请先进行用户登陆!</text>
-  </view>
-</block>
-<!-- 正在登陆或登陆失败时显示 -->
-<block wx:else>
-  <!-- 登陆失败不显示 -->
-  <block wx:if="{{!hasOpenId || loginState != 2}}">
-  </block>
 
-  <view class="text-center margin-top">
-    <text class="text-grey text-xl">{{motto}}</text>
+<view class="margin-xl padding-xl bg-white radius shadow shadow-lg">
+  <view class="flex justify-center">
+    <view class='text-center'>
+      <view class="cu-avatar xl round solids" style="background-image:url({{userInfo.avatarUrl}})"></view>
+      <view class="padding">{{userInfo.nickName}}</view>
+    </view>
   </view>
-</block>
+</view>
+
+<view class="cu-form-group margin-top">
+  <view class="title">学校</view>
+  <picker bindchange="PickerChange" value="{{index}}" range="{{sch_names}}">
+    <view class="picker">
+      {{index?sch_names[index]:cur_sch}}
+    </view>
+  </picker>
+</view>
+<view>
+  <view class="cu-form-group">
+    <view class="title">证件号</view>
+    <input placeholder="请输入证件号" bindinput="bindUserCodeInput"></input>
+  </view>
+  <view class="cu-form-group">
+    <view class="title">姓名</view>
+    <input placeholder="输入你的姓名" bindinput="bindUserNameInput"></input>
+  </view>
+</view>
+<view class="text-center margin-top">
+  <text class="text-grey text-xl">{{motto}}</text>
+</view>
+<view class="margin-tb-sm text-center"role=""aria-label="">
+  <button class="cu-btn round lines-mauve shadow size"role="button" 
+  aria-label="" aria-disabled="false" bindtap='logbtn'>完成绑定</button>
+</view>
