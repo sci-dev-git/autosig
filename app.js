@@ -52,8 +52,16 @@ App({
               if (this.userInfoReadyCallback2) {
                 this.userInfoReadyCallback2(res)
               }
+              if (this.userInfoReadyCallback3) {
+                this.userInfoReadyCallback3(res)
+              }
             }
           })
+        } else {
+          this.globalData.userInfoRequired = true //要求再次授权
+          if (this.userInfoReadyCallback2) {
+            this.userInfoReadyCallback2(res)
+          }
         }
       }
     })
@@ -71,5 +79,6 @@ App({
     userInfo: null,
     openId: null,
     loginState: 0, // 0 = not login, 1 = login, 2 = error
+    userInfoRequired: false // true=已经绑定，但是授权失效
   }
 })

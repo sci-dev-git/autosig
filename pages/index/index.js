@@ -14,7 +14,12 @@ Page({
   },
   onGotogroup(e) {
     this.setData({
-      PageCur: 'schedule'
+      PageCur: 'groups'
+    })
+  },
+  onGotocenter(e) {
+    this.setData({
+      PageCur: 'center'
     })
   },
   /**

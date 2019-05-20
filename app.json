@@ -5,7 +5,7 @@
     "pages/sign/home/home",
     "pages/groups/groups",
     "pages/navigator/home/home",
-    "pages/center/home/home"
+    "pages/center/center"
   ],
   "window": {
     "backgroundTextStyle": "light",

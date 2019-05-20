@@ -1,0 +1,111 @@
+<scroll-view scroll-y class="page show">
+  <cu-custom bgColor="bg-gradual-blue" isBack="{{true}}">
+    <view slot="backText">返回</view>
+    <view slot="content">个人中心</view>
+  </cu-custom>
+
+  <view class="cu-bar bg-white flex justify-center">
+      <view class='text-center margin-top' wx:if="{{!noImage}}">
+        <view class="cu-avatar xl round solids avatar" style="background-image:url({{userInfo.avatarUrl}})"></view>
+        <view class="padding nickName">{{userInfo.nickName}}</view>
+      </view>
+      <view class='text-center margin-top' wx:else>
+        加载中……
+      </view>
+  </view>
+
+
+
+  <view class="cu-bar bg-white solid-bottom margin-top">
+    <view class="action">
+      <text class="cuIcon-title text-orange "></text> 个人信息
+    </view>
+  </view>
+  
+  <view class="cu-list menu {{menuBorder?'sm-border':''}} {{menuCard?'card-menu margin-top':''}}">
+    <view class="cu-item {{menuArrow?'arrow':''}}">
+      <view class="content">
+        <text class="text-grey">姓名</text>
+      </view>
+    </view>
+    <view class="cu-item {{menuArrow?'arrow':''}}">
+      <view class="content">
+        <text class="text-grey">证件号</text>
+      </view>
+    </view>
+    <view class="cu-item {{menuArrow?'arrow':''}}">
+      <view class="content">
+        <text class="text-grey">学校</text>
+      </view>
+    </view>
+    <view class="cu-item {{menuArrow?'arrow':''}}">
+      <button class="cu-btn content" open-type="contact">
+        <text class="cuIcon-btn text-olive"></text>
+        <text class="text-grey">Open-type 按钮</text>
+      </button>
+    </view>
+    <view class="cu-item {{menuArrow?'arrow':''}}">
+      <navigator class="content" hover-class="none" url="../list/list" open-type="redirect">
+        <text class="cuIcon-discoverfill text-orange"></text>
+        <text class="text-grey">Navigator 跳转</text>
+      </navigator>
+    </view>
+    <view class="cu-item {{menuArrow?'arrow':''}}">
+      <view class="content">
+        <text class="cuIcon-emojiflashfill text-pink"></text>
+        <text class="text-grey">头像组</text>
+      </view>
+      <view class="action">
+        <view class="cu-avatar-group">
+          <view class="cu-avatar round sm" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big10004.jpg);"></view>
+          <view class="cu-avatar round sm" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big10003.jpg);"></view>
+          <view class="cu-avatar round sm" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big10002.jpg);"></view>
+          <view class="cu-avatar round sm" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big10001.jpg);"></view>
+        </view>
+        <text class="text-grey text-sm">4 人</text>
+      </view>
+    </view>
+    <view class="cu-item {{menuArrow?'arrow':''}}">
+      <view class="content">
+        <text class="cuIcon-btn text-green"></text>
+        <text class="text-grey">按钮</text>
+      </view>
+      <view class="action">
+        <button class="cu-btn round bg-green shadow">
+          <text class="cuIcon-upload"></text> 上传</button>
+      </view>
+    </view>
+    <view class="cu-item {{menuArrow?'arrow':''}}">
+      <view class="content">
+        <text class="cuIcon-tagfill text-red"></text>
+        <text class="text-grey">标签</text>
+      </view>
+      <view class="action">
+        <view class="cu-tag round bg-orange light">音乐</view>
+        <view class="cu-tag round bg-olive light">电影</view>
+        <view class="cu-tag round bg-blue light">旅行</view>
+      </view>
+    </view>
+    <view class="cu-item {{menuArrow?'arrow':''}}">
+      <view class="content">
+        <text class="cuIcon-warn text-green"></text>
+        <text class="text-grey">文本</text>
+      </view>
+      <view class="action">
+        <text class="text-grey text-sm">小目标还没有实现！</text>
+      </view>
+    </view>
+    <view class="cu-item">
+      <view class="content padding-tb-sm">
+        <view>
+          <text class="cuIcon-clothesfill text-blue margin-right-xs"></text> 多行Item</view>
+        <view class="text-gray text-sm">
+          <text class="cuIcon-infofill margin-right-xs"></text> 小目标还没有实现！</view>
+      </view>
+      <view class="action">
+        <switch class="switch-sex sm" bindchange="switchSex"></switch>
+      </view>
+    </view>
+  </view>
+
+</scroll-view>  

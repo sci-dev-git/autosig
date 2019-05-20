@@ -1,5 +1,5 @@
-<sign wx:if="{{PageCur=='sign'}}" bind:gotogroup='onGotogroup'></sign>
-<groups wx:if="{{PageCur=='schedule'}}"></groups>
+<sign wx:if="{{PageCur=='sign'}}" bind:gotogroup='onGotogroup' bind:gotocenter='onGotocenter'></sign>
+<groups wx:if="{{PageCur=='groups'}}"></groups>
 <navigator wx:if="{{PageCur=='navigator'}}"></navigator>
 <center wx:if="{{PageCur=='center'}}"></center>
 
@@ -10,15 +10,15 @@
     </view>
     <view class="{{PageCur=='sign'?'text-green':'text-gray'}}">开始签到</view>
   </view>
-  <view class="action" bindtap="onNavChange" data-cur="schedule">
+  <view class="action" bindtap="onNavChange" data-cur="groups">
     <view class='cuIcon-cu-image'>
-      <image src="/assets/tabbar/schedule{{PageCur=='schedule'?'_cur':''}}.png"></image>
+      <image src="/assets/tabbar/groups{{PageCur=='groups'?'_cur':''}}.png"></image>
     </view>
-    <view class="{{PageCur=='schedule'?'text-green':'text-gray'}}">我的群组</view>
+    <view class="{{PageCur=='groups'?'text-green':'text-gray'}}">我的群组</view>
   </view>
   <view class="action" bindtap="onNavChange" data-cur="navigator">
     <view class='cuIcon-cu-image'>
-      <image src="/assets/tabbar/navigator{{PageCur=='navigator'?'_cur':''}}.png"></image>
+      <image src="/assets/tabbar/navi{{PageCur=='navigator'?'_cur':''}}.png"></image>
     </view>
     <view class="{{PageCur=='navigator'?'text-green':'text-gray'}}">校园导航</view>
   </view>

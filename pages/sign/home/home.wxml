@@ -7,8 +7,16 @@
     <!-- <image src='/assets/bac-pic.png' class='bac-pic' ></image>  -->
     <view class="flex justify-center">
       <view class='text-center'>
-        <view class="cu-avatar xl round solids" style="background-image:url({{userInfo.avatarUrl}})"></view>
-        <view class="padding nickName">{{userInfo.nickName}}</view>
+        <block wx:if="{{hasUserInfo && !userInfoRequied}}">
+          <view class="cu-avatar xl round solids" bindtap='onAvatarTap' style="background-image:url({{userInfo.avatarUrl}})"></view>
+          <view class="padding nickName">{{userInfo.nickName}}</view>
+        </block>
+        <block wx:if="{{!hasUserInfo && !userInfoRequied}}">
+          <text>加载中……</text>
+        </block>
+        <block wx:if="{{!hasUserInfo && userInfoRequied}}">
+          <button wx:if="{{canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo" class='cu-btn round bg-green shadow'> 获取头像昵称 </button>
+        </block>
       </view>
     </view>
   </view>
