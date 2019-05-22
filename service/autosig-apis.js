@@ -157,47 +157,55 @@ module.exports.searchGroups = function (keyword, token, callback) {
   requestAPI(`${apiHost}/usr/search_groups?keyword=${keyword}&token=${token}`, callback)
 }
 
+var errDisplayed = false; // 对于多个异步请求同时抛出错误的情况，只反馈最早的错误
+
 /**
  * 通过showToast显示来自服务器的错误消息
  * @param status 回调函数中的错误信息
  */
 module.exports.showError = function(status) {
-  var err
-  switch(status.msg) {
-    case 'E_FAULT':
-      err = '操作失败'; break;
-    case 'E_SERVER_FAULT':
-      err = '服务正忙'; break;
-    case 'E_TOKEN_AUTH':
-      err = '验证失败'; break;
-    case 'E_USER_EXISTING':
-      err = '用户已存在'; break;
-    case 'E_USER_NON_EXISTING':
-      err = '用户不存在'; break;
-    case 'E_PERMISSION_DENIED':
-      err = '权限不足'; break;
-    case 'E_GROUP_EXISTING':
-      err = '群组已存在'; break;
-    case 'E_GROUP_NON_EXISTING':
-      err = '群组不存在'; break;
-    case 'E_ACTIVITY_EXISTING':
-      err = '活动已存在'; break;
-    case 'E_ACTIVITY_NON_EXISTING':
-      err = '活动不存在'; break;
-    case 'E_TASK_EXISTING':
-      err = '任务已存在'; break;
-    case 'E_TASK_NON_EXISTING':
-      err = '任务不存在'; break;
-    case 'E_ASSET_NOT_FOUND':
-      err = '资源未找到'; break;
-    case 'E_NETWORK':
-      err = '连接失败'; break;
-    default:
-      err = '操作失败'; break;
+  if (!errDisplayed) {
+    errDisplayed = true
+    var err
+    switch(status.msg) {
+      case 'E_FAULT':
+        err = '操作失败'; break;
+      case 'E_SERVER_FAULT':
+        err = '服务正忙'; break;
+      case 'E_TOKEN_AUTH':
+        err = '验证失败'; break;
+      case 'E_USER_EXISTING':
+        err = '用户已存在'; break;
+      case 'E_USER_NON_EXISTING':
+        err = '用户不存在'; break;
+      case 'E_PERMISSION_DENIED':
+        err = '权限不足'; break;
+      case 'E_GROUP_EXISTING':
+        err = '群组已存在'; break;
+      case 'E_GROUP_NON_EXISTING':
+        err = '群组不存在'; break;
+      case 'E_ACTIVITY_EXISTING':
+        err = '活动已存在'; break;
+      case 'E_ACTIVITY_NON_EXISTING':
+        err = '活动不存在'; break;
+      case 'E_TASK_EXISTING':
+        err = '任务已存在'; break;
+      case 'E_TASK_NON_EXISTING':
+        err = '任务不存在'; break;
+      case 'E_ASSET_NOT_FOUND':
+        err = '资源未找到'; break;
+      case 'E_NETWORK':
+        err = '连接失败'; break;
+      default:
+        err = '操作失败'; break;
+    }
+    wx.showModal({
+      title: '提示',
+      content: err,
+      showCancel: false,
+      complete: function () {
+        errDisplayed = false
+      }
+    })
   }
-  wx.showModal({
-    title: '提示',
-    content: err,
-    showCancel: false
-  })
 }
