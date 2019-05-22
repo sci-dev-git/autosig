@@ -13,8 +13,8 @@ Page({
     })
   },
   onGotogroup(e) {
-    this.setData({
-      PageCur: 'groups'
+    wx.navigateTo({
+      url: '/pages/groups/groups',
     })
   },
   onGotocenter(e) {

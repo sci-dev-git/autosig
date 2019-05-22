@@ -10,21 +10,15 @@ Page({
     openId: null,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
 
-    sch_names: ['tyut', 'aaa'],
+    place_names: ['太原理工大学'],
     cur_sch: '选择学校',
     StatusBar: app.globalData.StatusBar,
     CustomBar: app.globalData.CustomBar,
     motto: '欢迎进入独步校园！',
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
-    place: '',
+    place: '太原理工大学',
     userCode: '2018',
     userName: 'AAA'
-  },
-  //事件处理函数
-  bindViewTap: function() {
-    wx.navigateTo({
-      url: '../logs/logs'
-    })
   },
   onLoad: function () {
     this.setData({
@@ -40,7 +34,7 @@ Page({
       err = '姓名不能为空！'
     if (err != null) {
       wx.showModal({
-        title: '输入错误',
+        title: '请完善信息',
         content: err,
         showCancel: false
       })
@@ -48,6 +42,9 @@ Page({
     }
     var api = require('../../service/autosig-apis')
     var _this = this
+    wx.showLoading({
+      title: '请稍后',
+    })
     api.reg(
       this.data.openId,
       this.data.place,
@@ -55,10 +52,9 @@ Page({
       this.data.userName,
 
       function(status, data) {
+        wx.hideLoading()
         if(status.code == 0) {
-          app.globalData.token = data.token // 成功注册并登陆
-          app.globalData.loginState = 1
-          app.openIdReadyCallback()
+          app.loginAutosig(data) // 成功注册并登陆
           wx.showToast({
             title: '注册成功',
           })
@@ -67,6 +63,12 @@ Page({
           api.showError(status)
         }
       })
+  },
+  onPlaceChanged(e) {
+    var index = e.detail.value
+    this.setData({
+      place: this.data.place_names[index]
+    })
   },
   bindUserCodeInput(e){
     this.setData({

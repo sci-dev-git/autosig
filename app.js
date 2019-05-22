@@ -19,21 +19,19 @@ App({
             switch (status.msg) {
               case 'E_OK':
                 // 成功登陆 发送openId到后台
-                _this.globalData.openId = data.openId
-                _this.globalData.loginState = 1
-                _this.globalData.token = data.token
+                _this.loginAutosig(data)
                 break;
               case 'E_USER_NON_EXISTING':
                 // 用户不存在, 请求绑定. 发送openId到后台
                 _this.globalData.openId = data.openId
                 _this.globalData.loginState = 2
+                _this.updateLoginState()
                 break;
               default:
+                // 服务出错
                 _this.globalData.loginState = 3
+                _this.updateLoginState()
                 api.showError(status)
-            }
-            if (_this.openIdReadyCallback) {
-              _this.openIdReadyCallback()
             }
           })
       }
@@ -80,8 +78,25 @@ App({
       }
     })
   },
+  /**
+   * 成功登陆独步校园服务器后，暂存用户信息和登陆凭证
+   * @param resp 从login()或reg()接口返回的data对象。
+   */
+  loginAutosig(resp) {
+    this.globalData.openId = resp.openId
+    this.globalData.asusrInfo = resp.info
+    this.globalData.loginState = 1
+    this.globalData.token = resp.token
+    this.updateLoginState()
+  },
+  updateLoginState() {
+    if (this.loginStateCallback) {
+      this.loginStateCallback()
+    }
+  },
   globalData: {
     userInfo: null,
+    asusrInfo: null,
     openId: null,
     token: null,
     loginState: 0, // 0 = logining, 1 = login, 2 = not login, 3 = error

@@ -14,9 +14,9 @@
 
 <view class="cu-form-group margin-top">
   <view class="title">学校</view>
-  <picker bindchange="PickerChange" value="{{index}}" range="{{sch_names}}">
+  <picker bindchange="onPlaceChanged" value="{{index}}" range="{{place_names}}">
     <view class="picker">
-      {{index?sch_names[index]:cur_sch}}
+      {{index?place_names[index]:place}}
     </view>
   </picker>
 </view>

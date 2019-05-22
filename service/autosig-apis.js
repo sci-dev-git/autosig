@@ -56,6 +56,7 @@ function throwParamCheckError(callback) {
  * @param place 学校
  * @param code 证件号
  * @param name 姓名
+ * @return 成功 (返回成功调用login的所有数据)
  */
 module.exports.reg = function (openid, place, code, name, callback) {
   if (openid == null || place == null || code == null || name == null) {
@@ -68,16 +69,92 @@ module.exports.reg = function (openid, place, code, name, callback) {
 /**
  * 用户登陆接口
  * @param jscode
- * @return 成功：data.token: 用于内部认证的唯一凭证。
- *              data.openid: 获取从微信服务器获取到的openid
- *        失败：返回错误代码。
+ * @return 成功:
+ * {
+ *   token: 用于内部认证的唯一凭证
+ *   openId: 从微信后台换取的用户ID
+ *   info: {
+ *     realName:
+ *     code:
+ *     place:
+ *     openId:
+ *   }
+ * }
+ * 失败：返回错误代码。
  */
 module.exports.login = function (jscode, callback) {
   if (jscode == null) {
-    throwParamCheckErrorr(callback)
+    throwParamCheckError(callback)
     return
   }
   requestAPI(`${apiHost}/usr/login?wxcode=${jscode}`, callback)
+}
+
+/**
+ * 创建群组接口
+ * @param token 用于内部认证的唯一凭证
+ * @param name 群名称
+ * @param desc 群描述
+ */
+module.exports.createGroup = function (token, name, desc, callback) {
+  if (token == null || name == null || desc == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/usr/create_group?name=${name}&desc=${desc}&token=${token}`, callback)
+}
+
+/**
+ * 获取创建的群组接口
+ * @param token 用于内部认证的唯一凭证
+ * @return
+ * {
+ *   size: 返回群组的数量
+ *   groups: {}
+ * }
+ */
+module.exports.getCreatedGroups = function (token, callback) {
+  if (token == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/usr/get_created_groups?token=${token}`, callback)
+}
+
+/**
+ * 获取附近的群组
+ * @param token 用于内部认证的唯一凭证
+ * @return
+ * {
+ *   size: 返回群组的数量
+ *   groups: {}
+ * }
+ */
+module.exports.getNearbyGroups = function (token, maxlen, callback) {
+  if (token == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/usr/get_nearby_groups?maxlen=${maxlen}&token=${token}`, callback)
+}
+
+
+/**
+ * 搜索群组接口
+ * @param keyword 关键字
+ * @param token 用于内部认证的唯一凭证
+ * @return
+ * {
+ *   size: 返回群组的数量
+ *   groups: {}
+ * }
+ */
+module.exports.searchGroups = function (keyword, token, callback) {
+  if (token == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/usr/search_groups?keyword=${keyword}&token=${token}`, callback)
 }
 
 /**
@@ -119,7 +196,7 @@ module.exports.showError = function(status) {
       err = '操作失败'; break;
   }
   wx.showModal({
-    title: '出错啦',
+    title: '提示',
     content: err,
     showCancel: false
   })

@@ -1,5 +1,4 @@
 <sign wx:if="{{PageCur=='sign'}}" bind:gotogroup='onGotogroup' bind:gotocenter='onGotocenter'></sign>
-<groups wx:if="{{PageCur=='groups'}}"></groups>
 <navigator wx:if="{{PageCur=='navigator'}}"></navigator>
 <center wx:if="{{PageCur=='center'}}"></center>
 

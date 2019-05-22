@@ -15,7 +15,7 @@ Component({
     loginState: 0,
 
     attendedGroup: false,
-    taskTotal: '1',
+    taskTotal: '--',
     taskFinished: '--',
     taskRatio: '---',
     iconList: [{
@@ -106,11 +106,11 @@ Component({
         loginState: app.globalData.loginState,
         hasOpenId: true
       })
-      this.openIdAcquired()
+      this.loginStateChanged()
     }
     // 由于 login 是网络请求，可能会在 Page.onLoad 之后才返回
     // 所以此处加入 callback 以防止这种情况
-    app.openIdReadyCallback = () => {
+    app.loginStateCallback = () => {
       if (app.globalData.openId) { //登陆未出错
         this.setData({
           openId: app.globalData.openId,
@@ -120,13 +120,23 @@ Component({
       this.setData({
         loginState: app.globalData.loginState
       })
-      this.openIdAcquired()
+      this.loginStateChanged()
     }
   },
   methods: {
-    openIdAcquired: function () { //获取到openId时被调用
+    /**
+     * 登陆状态改变时被调用
+     * 在此处异步获取主页面所需的数据。
+     */
+    loginStateChanged: function () {
       wx.hideLoading()
-      if (this.data.loginState == 1) { // 无需绑定
+      switch (this.data.loginState) {
+        case 2: // 要求绑定
+          this.setData({taskTotal: '1'})
+          break;
+        case 1: // 成功登陆
+          this.setData({ taskTotal: '--' })
+          break;
       }
     },
     onGotoRegister(e) {
