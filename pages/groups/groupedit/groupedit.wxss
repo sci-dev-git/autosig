@@ -1,0 +1,13 @@
+/* pages/groups/groupedit/groupedit.wxss */
+.infoPanel {
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+}
+
+.edit-panel {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  align-items:center;
+}

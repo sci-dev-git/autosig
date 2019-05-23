@@ -1,0 +1,91 @@
+<cu-custom bgColor="bg-gradual-blue" isBack='true'>
+  <view slot="content">编辑群组</view>
+  <view slot="backText">返回</view>
+  <view class="action" slot="right">
+    <view class="cu-load load-icon {{loading[0]?'loading':'over'}}"></view>
+  </view>
+</cu-custom>
+
+<block wx:if="{{manageGroup}}">
+  <form>
+    <view class="cu-form-group">
+      <view class="title">名称</view>
+      <input value="{{currentGroup.name}}" placeholder="输入群组名称" bindinput="bindGroupNameInput"></input>
+      <text class="cuIcon-edit"></text>
+    </view>
+    <view class="cu-form-group align-start">
+      <view class="title">简介</view>
+      <textarea value="{{currentGroup.desc.length ? currentGroup.desc : '无'}}" maxlength="100" bindinput="textareaBInput" placeholder="输入群组描述（100字以内）" bindinput="bindGroupDescInput"></textarea>
+    </view>
+    <view class="cu-form-group justify-right align-center">
+      <button class="cu-btn round lines-cyan shadow"role="button"aria-label=""aria-disabled="false" bindtap='onSaveInfo'>保存</button>
+      <view class="cu-capsule radius bg-cyan">
+        <view class="cu-tag bg-gray">地点</view>
+        <view class="cu-tag line-white">{{currentGroup.place}}</view>
+      </view>
+    </view>
+  </form>
+</block>
+<block wx:else>
+  <view class="padding edit-panel solid-bottom">
+    <view>{{currentGroup.name}}</view>
+  </view>
+  <view class="padding bg-white">
+    <view>简介：{{currentGroup.desc.length ? currentGroup.desc : '无'}}</view>
+    <view class="cu-capsule radius bg-cyan margin-top">
+      <view class="cu-tag bg-gray">地点</view>
+      <view class="cu-tag line-white">{{currentGroup.place}}</view>
+    </view>
+  </view>
+</block>
+
+<view wx:if="{{manageGroup}}" class="padding flex flex-direction">
+  <button class="cu-btn bg-red margin-tb-sm lg" bindtap='onRemoveGroup'>删除该群</button>
+</view>
+<view wx:else class="padding flex flex-direction">
+  <button class="cu-btn bg-red margin-tb-sm lg" bindtap='onQuitGroup'>退出该群</button>
+</view>
+
+<block wx:if="{{manageGroup}}">
+  <view class="padding indexItem-A" id="0" data-index="0">管理活动 ({{lenActivities}})</view>
+  <block wx:if="{{lenActivities>0}}">
+  <view class="cu-list menu-avatar no-padding">
+    <block wx:for="{{activities}}" wx:key>
+      <view class="cu-item">
+        <view class="cu-avatar round lg">A</view>
+        <view class="content">
+          <view class="text-grey">
+            <text class="text-abc">{{activities[index].name}}</text>
+            <text class="text-abc">{{activities[index].place}}</text>
+            <text class="text-abc">{{activities[index].host}}</text>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+</block>
+<block wx:else>
+  <view class="cu-load bg-white {{loading[0] ? 'loading':'over'}}}}"></view>
+</block>
+
+</block>
+
+<view class="padding indexItem-A" id="0" data-index="0">{{(manageGroup?'管理':'')+'群成员 ('+lenMembers+')'}}</view>
+<block wx:if="{{lenMembers>0}}">
+  <view class="cu-list menu-avatar no-padding">
+    <block wx:for="{{members}}" wx:key>
+      <view class="cu-item">
+        <view class="cu-avatar round lg">U</view>
+        <view class="content">
+          <view class="text-grey">
+            <text class="text-abc">{{members[index].realName}}</text>
+          </view>
+        </view>
+        <button wx:if="{{manageGroup}}" class="cu-btn bg-red margin-right" data-cur='{{members[index]}}' bindtap="onRemoveMember">删除</button>
+      </view>
+    </block>
+  </view>
+</block>
+<block wx:else>
+  <view class="cu-load bg-white {{loading[0] ? 'loading':'over'}}}}"></view>
+</block>

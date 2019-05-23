@@ -23,11 +23,11 @@
 <view>
   <view class="cu-form-group">
     <view class="title">证件号</view>
-    <input placeholder="请输入证件号" bindinput="bindUserCodeInput"></input>
+    <input placeholder="请输入证件号" bindinput="bindUserCodeInput" type="idcard"></input>
   </view>
   <view class="cu-form-group">
     <view class="title">姓名</view>
-    <input placeholder="输入你的姓名" bindinput="bindUserNameInput"></input>
+    <input placeholder="输入你的姓名" bindinput="bindUserNameInput" type="text"></input>
   </view>
 </view>
 <view class="text-center margin-top">

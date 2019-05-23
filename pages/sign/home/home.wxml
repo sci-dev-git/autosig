@@ -25,11 +25,12 @@
     </view>
   </view>
   
-  <view class="flex text-center text-grey bg-white shadow-warp infoSize">
-    <view class="flex flex-sub flex-direction solid-right toboBar">
+  <view class="flex text-center text-grey bg-white shadow-warp align-center infoSize">
+    <view class="flex flex-sub flex-direction solid-right">
       <view class="text-xxl text-orange">{{taskTotal}}</view>
       <view class="margin-top-sm">
-        <text class="cuIcon-attentionfill"></text> 总任务</view>
+        <text class="cuIcon-attentionfill"></text> 总任务
+      </view>
     </view>
     <scroll-view scroll-x class='mainNavi' bindscroll='onToolbarScroll'>
       <view class="cu-list grid col-7 no-border naviButtons">
@@ -43,7 +44,7 @@
         </view>
       </view>
     </scroll-view>
-    <view class='toboBar-next'>{{toolbarForwardHint}}</view>
+    <view class='mainNavi-next'>{{toolbarForwardHint}}</view>
   </view>
 
   <block wx:if="{{loginState == 0}}">
@@ -133,7 +134,7 @@
             <view class="bg-cyan radius shadow-blur content">
               <view class="cu-capsule radius">
                 <view class="cu-tag bg-gray">系统消息</view>
-                <view class="cu-tag line-white">完善个人信息</view>
+                <view class="cu-tag line-white">请完善个人信息</view>
               </view>
               
               <view class='margin-top margin-right'>欢迎来到“独步校园”。我们将为您提供最简洁的校园信息服务。若要开始，请先完善个人信息。</view>

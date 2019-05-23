@@ -1,0 +1,25 @@
+var maxlen = 15
+var extralen = 5
+
+function cuts(val, len) {
+  if (val.length == 0 || val == undefined) {
+    return val;
+  } else if (val.length > len) {
+    return val.substring(0, len) + "...";
+  }
+  return val
+}
+
+/**
+ * 截取多余的字符串用于显示
+ */
+var cutstr = function(val) {
+  return cuts(val, maxlen);
+}
+
+var cutstr2 = function (val) {
+  return cuts(val, maxlen + extralen + 3); // 包括...符号的3字节
+}
+
+module.exports.cutstr = cutstr
+module.exports.cutstr2 = cutstr2

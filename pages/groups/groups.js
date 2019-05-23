@@ -2,8 +2,9 @@ const app = getApp()
 Page({
   data: {
     showSearchResults: false,
-    groupName: '测试群组',
-    groupDesc: '2',
+    groupName: '测试群组 2',
+    groupDesc: 'TFEEWLIGNJERKGJKBFEWBFWLGVNWWL WENFWLJGKWKVL WKNF KGWG W GWGW EWJKFGRGGNWGWB BER,BGL',
+    loading: [false, false, false, false], // nearby, attended, created, search
     nearbyGroups: null,
     lenNearbyGroups: 0,
     attendedGroups: null,
@@ -13,23 +14,26 @@ Page({
     searchResults: null,
     lenSearchResults: 0,
     maxlenNearbyGroups: 10, // “附近群组”最多显示的数据条数
-    searchContent: ''
+    searchContent: '',
+    currentGroup: null,
+    showGroupDetails: false
   },
-  onLoad: function (opt) {
+  onShow: function (opt) {
     this.fetchData()
   },
   /**
-   * 从服务器拉取数据
+   * Helper函数 - 从服务器拉取数据
    */
   fetchData() {
-    this.setData({ loading: true })
     var api = require('../../service/autosig-apis')
     var _this = this
     // 获取附近的群组
+    this.setData({'loading[0]': true})
     api.getNearbyGroups(
       app.globalData.token,
       _this.data.maxlenNearbyGroups,
       function (status, data) {
+        _this.setData({ 'loading[0]': false })
         if (status.code == 0) {
           _this.setData({
             lenNearbyGroups: data.size,
@@ -40,10 +44,28 @@ Page({
         }
       }
     )
+    // 获取加入的群组
+    this.setData({ 'loading[1]': true })
+    api.getAttendedGroups(
+      app.globalData.token,
+      function (status, data) {
+        _this.setData({ 'loading[1]': false })
+        if (status.code == 0) {
+          _this.setData({
+            lenAttendedGroups: data.size,
+            attendedGroups: data.groups
+          })
+        } else {
+          api.showError(status)
+        }
+      }
+    )
     // 获取创建的群组
+    this.setData({ 'loading[2]': true })
     api.getCreatedGroups(
       app.globalData.token,
       function (status, data) {
+        _this.setData({ 'loading[2]': false })
         if (status.code == 0) {
           _this.setData({
             lenCreatedGroups: data.size,
@@ -55,7 +77,37 @@ Page({
       }
     )
   },
-  onAddGroup: function() {
+  /**
+   * Helper函数- 加入群组
+   * @param uid 目标群组的UID.
+   */
+  joinGroup: function(uid) {
+    wx.showLoading({
+      title: '请稍后',
+    })
+    var api = require('../../service/autosig-apis')
+    var _this = this
+    api.attendGroup(
+      uid,
+      app.globalData.token,
+      function (status, data) {
+        wx.hideLoading()
+        if (status.code == 0) {
+          _this.fetchData()
+          wx.showToast({
+            title: '加入成功',
+            showCancel: false
+          })
+        } else {
+          api.showError(status)
+        }
+      }
+    )
+  },
+  /**
+   * 单击 创建群组
+   */
+  onCreateGroup: function() {
     var err = null
     if (this.data.groupName.length == 0)
       err = '群名称不能为空'
@@ -69,6 +121,9 @@ Page({
       })
       return
     }
+    wx.showLoading({
+      title: '请稍后',
+    })
     var api = require('../../service/autosig-apis')
     var _this = this
     api.createGroup(
@@ -77,6 +132,7 @@ Page({
       this.data.groupDesc,
 
       function (status, data) {
+        wx.hideLoading()
         if (status.code == 0) {
           _this.fetchData()
           wx.showToast({
@@ -87,12 +143,18 @@ Page({
         }
       })
   },
+  /**
+   * （新建）群名称输入框内容改变
+   */
   bindGroupNameInput(e) {
     this.setData({ groupName: e.detail.value.trim() })
   },
   bindGroupDescInput(e) {
     this.setData({ groupDesc: e.detail.value })
   },
+  /**
+   * 单击 搜索按钮
+   */
   onSearch() {
     if (this.data.searchContent.length == 0) {
       wx.showModal({
@@ -107,11 +169,13 @@ Page({
     this.setData({ lenSearchResults: 0 })
     var api = require('../../service/autosig-apis')
     var _this = this
+    this.setData({'loading[3]': true})
     api.searchGroups(
       _this.data.searchContent,
       app.globalData.token,
       function (status, data) {
         wx.hideLoading()
+        _this.setData({ 'loading[3]': false })
         if (status.code == 0) {
           _this.setData({
             lenSearchResults: data.size,
@@ -129,7 +193,77 @@ Page({
       }
     )
   },
+  /**
+   * 搜索输入框内容改变
+   */
   bindSearchInput(e) {
     this.setData({ searchContent: e.detail.value.trim() })
+    if (this.data.searchContent.length == 0) {
+      this.setData({ lenSearchResults: 0 })
+      return
+    }
+    var api = require('../../service/autosig-apis')
+    var _this = this
+    var targetKeyword = _this.data.searchContent
+    this.setData({'loading[3]': true})
+    api.searchGroups(
+      _this.data.searchContent,
+      app.globalData.token,
+      function (status, data, keyword) {
+        _this.setData({ 'loading[3]': false })
+        wx.hideLoading()
+        if (status.code == 0 && keyword == targetKeyword) {
+          _this.setData({
+            lenSearchResults: data.size,
+            searchResults: data.groups
+          })
+        }
+      }
+    )
+  },
+  /**
+   * 单击 加入（群组）
+   */
+  onJoinGroup(e) {
+    var group = e.currentTarget.dataset.cur
+    this.joinGroup(group.uid)
+  },
+  /**
+   * 单击群组列表时显示详细信息
+   */
+  onShowGroupDetail(e) {
+    var group = e.currentTarget.dataset.cur
+    this.setData({
+      showGroupDetails: true,
+      currentGroup: group
+    })
+  },
+  onHideGroupDetails() {
+    this.setData({showGroupDetails: false})
+  },
+  /**
+   * Helper函数 - 调出编辑群组对话框
+   */
+  showGroupEdit(group, manage) {
+    app.globalData.groupedit_currentGroup = group
+    app.globalData.groupedit_manageGroup = manage
+    app.globalData.groupedit_fetchData = this.fetchData
+    wx.navigateTo({
+      url: './groupedit/groupedit',
+    })
+  },
+  /**
+   * 在“加入的群组”列表中单击
+   */
+  onOpenAttendedGroupEdit(e) {
+    var group = e.currentTarget.dataset.cur
+    this.showGroupEdit(group, false)
+  },
+  /**
+   * 在“创建的群组”列表中单击
+   */
+  onOpenCreatedGroupEdit(e) {
+    var group = e.currentTarget.dataset.cur
+    this.showGroupEdit(group, true)
   }
 })

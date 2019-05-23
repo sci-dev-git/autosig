@@ -100,6 +100,10 @@ App({
     openId: null,
     token: null,
     loginState: 0, // 0 = logining, 1 = login, 2 = not login, 3 = error
-    authRequired: false // true=要求授权
+    authRequired: false, // true=要求授权
+
+    groupedit_currentGroup: null,
+    groupedit_manageGroup: false,
+    groupedit_fetchData: null
   }
 })

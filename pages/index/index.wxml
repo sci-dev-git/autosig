@@ -1,6 +1,5 @@
 <sign wx:if="{{PageCur=='sign'}}" bind:gotogroup='onGotogroup' bind:gotocenter='onGotocenter'></sign>
 <navigator wx:if="{{PageCur=='navigator'}}"></navigator>
-<center wx:if="{{PageCur=='center'}}"></center>
 
 <!-- <view class="cu-bar tabbar bg-white shadow foot ">
   <view class="action" bindtap="onNavChange" data-cur="sign">

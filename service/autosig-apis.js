@@ -18,7 +18,7 @@ const app = getApp()
 //const apiHost = "https://autosigs.applinzi.com";
 const apiHost = "http://localhost:5050"; // for debug
 
-function requestAPI(url, callback) {
+function requestAPI(url, callback, opaque) {
   wx.request({
     url: url,
     success: function (res) {
@@ -32,15 +32,15 @@ function requestAPI(url, callback) {
           var code = responseObj.status.code
           console.warn('autosig-api: server returns: msg = '+msg+', code = '+code)
         }
-        callback(responseObj.status, responseObj.data);
+        callback(responseObj.status, responseObj.data, opaque);
       } catch(e) {
         console.warn(e)
         console.warn('autosig-api: server returns invalid data.')
-        callback({ "code": -2, "msg": "E_NETWORK" }, null)
+        callback({ "code": -2, "msg": "E_NETWORK" }, null, opaque)
       }
     },
     fail: function (res) {
-      callback({ "code": -1, "msg": "E_NETWORK" }, null);
+      callback({ "code": -1, "msg": "E_NETWORK" }, null, opaque);
     }
   });
 }
@@ -140,9 +140,29 @@ module.exports.getNearbyGroups = function (token, maxlen, callback) {
 
 
 /**
+ * 获取已加入的群组接口
+ * @param token 用于内部认证的唯一凭证
+ * @return
+ * {
+ *   size: 返回群组的数量
+ *   groups: {}
+ * }
+ */
+module.exports.getAttendedGroups = function (token, callback) {
+  if (token == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/usr/get_attended_groups?token=${token}`, callback)
+}
+
+
+/**
  * 搜索群组接口
  * @param keyword 关键字
  * @param token 用于内部认证的唯一凭证
+ * @param callback 特殊，其参数为(state, data, keyword)。keyword为开始异步调用时
+ *  传入的关键字参数的副本。
  * @return
  * {
  *   size: 返回群组的数量
@@ -154,7 +174,87 @@ module.exports.searchGroups = function (keyword, token, callback) {
     throwParamCheckError(callback)
     return
   }
-  requestAPI(`${apiHost}/usr/search_groups?keyword=${keyword}&token=${token}`, callback)
+  requestAPI(`${apiHost}/usr/search_groups?keyword=${keyword}&token=${token}`, callback, keyword)
+}
+
+/**
+ * 加群接口
+ * @param uid 目标群组的uid
+ * @param token 用于内部认证的唯一凭证
+ */
+module.exports.attendGroup = function (uid, token, callback) {
+  if (uid == null || token == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/group/attend?uid=${uid}&token=${token}`, callback)
+}
+
+/**
+ * 退群接口
+ * @param uid 目标群组的uid
+ * @param token 用于内部认证的唯一凭证
+ */
+module.exports.quitGroup = function (uid, token, callback) {
+  if (uid == null || token == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/group/quit?uid=${uid}&token=${token}`, callback)
+}
+
+/**
+ * 获取群组成员的接口
+ * @param uid 目标群组的uid
+ */
+module.exports.getGroupMembers = function (uid, callback) {
+  if (uid == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/group/get_members?uid=${uid}`, callback)
+}
+
+/**
+ * 删除群组成员的接口
+ * @param uid 目标群组的uid
+ * @param openid 目标用户的openId
+ * @param token 用于内部认证的唯一凭证
+ */
+module.exports.removeGroupMember = function (uid, openId, token, callback) {
+  if (uid == null || openId == null || token == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/group/remove_member?uid=${uid}&openid=${openId}&token=${token}`, callback)
+}
+
+/**
+ * 删除群组的接口
+ * @param uid 目标群组的uid
+ * @param token 用于内部认证的唯一凭证
+ */
+module.exports.removeGroup = function (uid, token, callback) {
+  if (uid == null || token == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/usr/remove_group?uid=${uid}&token=${token}`, callback)
+}
+
+/**
+ * 更新群组信息的接口
+ * @param uid 目标群组的uid
+ * @param name 群组名称
+ * @param desc 群组描述
+ * @param token 用于内部认证的唯一凭证
+ */
+module.exports.updateGroupInfo = function (uid, name, desc, token, callback) {
+  if (uid == null || name == null || desc == null || token == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/group/update_info?uid=${uid}&name=${name}&desc=${desc}&token=${token}`, callback)
 }
 
 var errDisplayed = false; // 对于多个异步请求同时抛出错误的情况，只反馈最早的错误

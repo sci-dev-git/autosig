@@ -83,16 +83,12 @@
   height: 75rpx;
 }
 
-.toboBar {
-  margin-top:40rpx;
-}
-
 .mainNavi {
-  width:74%; /* 务必使用百分比 */
+  width:74%;
   margin-left: 5rpx;
 }
 
-.toboBar-next {
+.mainNavi-next {
   width: 30rpx;
   display: flex;
   flex-direction: column;
