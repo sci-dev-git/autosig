@@ -3,7 +3,7 @@
   <view wx:else slot="content">查看群组</view>
   <view slot="backText">返回</view>
   <view class="action" slot="right">
-    <view class="cu-load load-icon {{loading[0]?'loading':'over'}}"></view>
+    <view class="cu-load load-icon {{loading[0] || loading[1]?'loading':'over'}}"></view>
   </view>
 </cu-custom>
 
@@ -34,7 +34,7 @@
       </block>
     </view>
     
-    <view class="cu-form-group justify-right align-center">
+    <view class="cu-form-group align-center">
       <view>
         <view class="cu-btn cuIcon-post round lines-cyan" role="button"aria-label=""aria-disabled="false" bindtap='onSaveInfo'>{{groupEditMode?'保存':'编辑'}}</view>
         <view class="cu-btn cuIcon-close round lines-cyan margin-left" role="button"aria-label=""aria-disabled="false" wx:if="{{groupEditMode}}" bindtap='onCloseInfoEdit'></view>
@@ -61,43 +61,53 @@
 </view>
 
 <block wx:if="{{manageGroup}}">
-  <view class="cu-bar justify-right bg-white margin-top">
+  <view class="cu-bar bg-white margin-top">
     <view class="action border-title">
       <text class="text-bold text-blue">管理活动 ({{lenActivities}})</text>
       <text class="bg-gradual-blue" style="width:3rem"></text>
     </view>
+    <view class='padding bg-white'>
+      <button class='cu-btn cuIcon-add round lines-cyan' bindtap='onCreateActivity'>添加</button>
+    </view>
   </view>
   <scroll-view scroll-x class="bg-white nav" scroll-with-animation scroll-left="{{scrollLeft}}">
-    <view class="cu-item {{index==daySelectorCur?'text-green cur':''}}" wx:for="{{7}}" wx:key bindtap="onDaySelectorTap" data-id="{{index}}">
+    <view class="cu-item {{index==daySelectorCur?'text-green cur':''}}" wx:for="{{6}}" wx:key bindtap="onDaySelectorTap" data-id="{{index}}">
       周{{sdisp.getDayStr(index)}}
     </view>
   </scroll-view>
-  <view class='padding bg-white'>
-    <button class='cu-btn cuIcon-add round lines-cyan' bindtap='onCreateActivity'>添加</button>
-  </view>
+
   <block wx:if="{{lenActivities>0}}">
-  <view class="cu-list menu-avatar no-padding">
-    <block wx:for="{{activities}}" wx:key>
+    <view class="cu-list menu no-padding margin-top-sm " wx:for="{{activities}}" wx:key>
       <view class="cu-item">
-        <view class="cu-avatar round lg">A</view>
-        <view class="content">
-          <view class="text-grey">
-            <text class="text-abc">{{activities[index].name}}</text>
-            <text class="text-abc">{{activities[index].place}}</text>
-            <text class="text-abc">{{activities[index].host}}</text>
-          </view>
+        <view class="text-grey flex flex-direction">
+          <text class="margin-top-sm text-abc flex-sub">名称：{{activities[index].name}}</text>
+          <text class="margin-top-sm text-abc flex-sub">地点：{{activities[index].where}}</text>
+          <text class="margin-top-sm text-abc flex-sub">主讲：{{activities[index].host}}</text>
+          <text class="margin-top-sm text-abc flex-sub">时间：{{sdisp.timestr(activities[index].startHour, activities[index].startMinute)}}</text>
+          <text class="margin-top-sm margin-bottom-sm text-abc flex-sub">简介：{{activities[index].desc.length?activities[index].desc:'无'}}</text>
+        </view>
+        <view class='cu-list grid col-5 no-border week-selector-preview' data-cur="{{activities[index]}}" bindtap='onEditActivityTap'>
+          <block wx:for="{{25}}" wx:for-index="week" wx:key>
+            <text class="tb-block {{sdisp.listContains(activities[index].weeks, week+1) ? 'bg-cyan' : 'bg-white'}}" bindtap='onWeekTap' data-cur='{{week}}'>{{week+1}}</text>
+          </block>
         </view>
       </view>
-    </block>
-  </view>
+      <view class="cu-item right-align">
+        <view/>
+        <view class='margin-sm'>
+          <button class="cu-btn cuIcon-edit lines-cyan" data-cur="{{activities[index]}}" bindtap='onEditActivityTap'> 修改</button>
+          <button class="cu-btn cuIcon-delete lines-red margin-left-sm" data-cur="{{activities[index]}}" bindtap='onRemoveActivity'> 删除</button>
+        </view>
+      </view>
+    </view>
+  </block>
+  <block wx:else>
+    <view class="cu-load bg-white {{loading[0] ? 'loading':'over'}}}}"></view>
+  </block>
+
 </block> <!--manageGroup-->
-<block wx:else>
-  <view class="cu-load bg-white {{loading[0] ? 'loading':'over'}}}}"></view>
-</block>
 
-</block>
-
-<view class="cu-bar justify-right bg-white margin-top">
+<view class="cu-bar bg-white margin-top">
   <view class="action border-title">
     <text class="text-bold text-blue">{{(manageGroup?'管理':'')+'群成员 ('+lenMembers+')'}}</text>
     <text class="bg-gradual-blue" style="width:3rem"></text>
@@ -126,7 +136,8 @@
 <view class="cu-modal {{showCreateActivity?'show':''}}">
   <view class="cu-dialog">
     <view class="cu-bar bg-white justify-end">
-      <view class="content">添加活动</view>
+      <view wx:if="{{acitivityEditMode}}" class="content">修改活动</view>
+      <view wx:else class="content">添加活动</view>
       <view class="action" bindtap="onHideCreateActivity">
         <text class="cuIcon-close text-red"></text>
       </view>
@@ -139,7 +150,7 @@
           <form>
             <view class="cu-form-group">
               <view class="title">名称</view>
-              <input disabled='{{!showCreateActivity}}' placeholder="输入活动名称" bindinput="bindActivityNameInput"></input>
+              <input disabled='{{!showCreateActivity}}' value="{{activityName}}" placeholder="输入活动名称" bindinput="bindActivityNameInput"></input>
               <text class="cuIcon-edit"></text>
             </view>
             <view class="cu-form-group">
@@ -157,31 +168,31 @@
                 <view class="cu-item {{2==weekModeCur?'bg-cyan.light cur':''}}" bindtap="onSwitchWeekMode" data-mode="{{2}}">双周</view>
               </scroll-view>
             </view>
-            <view class="cu-form-group align-start">
+            <view class="cu-form-group">
               <view class='cu-list grid col-5 no-border'>
                 <block wx:for="{{25}}" wx:for-index="week" wx:key>
                   <text class="tb-block {{weekSelected[week] ? 'bg-cyan' : 'bg-white'}}" bindtap='onWeekTap' data-cur='{{week}}'>{{week+1}}</text>
                 </block>
               </view>
             </view>
-            <view class="cu-form-group align-start">
+            <view class="cu-form-group">
               <view class="title">地点</view>
-              <text maxlength="100" disabled='{{!showCreateActivity}}' bindinput="bindActivityWhereInput" placeholder="输入活动地点" bindinput="bindActivityWhereInput"></text>
+              <input maxlength="100" disabled='{{!showCreateActivity}}' bindinput="bindActivityWhereInput"  value="{{activityWhere}}" placeholder="输入活动地点"></input>
             </view>
-            <view class="cu-form-group align-start">
+            <view class="cu-form-group">
               <view class="title">主讲</view>
-              <text  maxlength="100" disabled='{{!showCreateActivity}}' bindinput="bindActivityHostInput" placeholder="输入活动主讲" bindinput="bindActivityHostInput"></text>
+              <input  maxlength="100" disabled='{{!showCreateActivity}}' bindinput="bindActivityHostInput"  value="{{activityHost}}" placeholder="输入活动主讲"></input>
             </view>
             <view class="cu-form-group align-start">
               <view class="title">简介</view>
               <!-- FIXME disabled : seems a bug of wx native widget -->
-              <textarea maxlength="100" disabled='{{!showCreateActivity}}'  bindinput="bindActivityDescInput" placeholder="输入活动描述（100字以内）" bindinput="bindActivityDescInput"></textarea>
+              <textarea maxlength="100" disabled='{{!showCreateActivity}}'  bindinput="bindActivityDescInput"  value="{{activityDesc}}" placeholder="输入活动描述（100字以内）"></textarea>
             </view>
             <view class="cu-form-group right-align align-center">
               <template is='place-capsule'/>
             </view>
             <view class="padding">
-              <button class="cu-btn block bg-blue.light margin-tb-sm lg" bindtap='onCreateGroup'>创建</button>
+              <button class="cu-btn block bg-blue.light margin-tb-sm lg" bindtap='onUpdateGroup'>{{acitivityEditMode?'修改':'创建'}}</button>
             </view>
           </form>
         </view>

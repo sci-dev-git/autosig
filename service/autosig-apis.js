@@ -1,5 +1,8 @@
+/**@file
+ * 与后端服务连接的胶合逻辑
+ */
 /*
- *  Autosign (AP-scanning-based Attendance Signature System)
+ *  Autosign (独步校园) (AP-scanning-based Attendance Signature System)
  *  Copyright (C) 2019, AutoSig team. <diyer175@hotmail.com>
  *
  *  This project is free software; you can redistribute it and/or
@@ -257,6 +260,119 @@ module.exports.updateGroupInfo = function (uid, name, desc, token, callback) {
   requestAPI(`${apiHost}/group/update_info?uid=${uid}&name=${name}&desc=${desc}&token=${token}`, callback)
 }
 
+/**
+ * 从群组创建活动的接口
+ * @param uid 目标群组的uid
+ * @param update 是否仅更新数据（不创建）
+ * @param activity_uid 目标活动的uid (仅当update-true时有效，否则设为null)
+ * @param name 活动的名称
+ * @param where 活动地点
+ * @param host 活动主讲
+ * @param start_hour 起始时间 时
+ * @param start_minute 起始时间 分
+ * @param day 星期
+ * @param weeks 周数列表
+ * @param desc 描述
+ * @param token 用于内部认证的唯一凭证
+ */
+module.exports.createActivity = function (
+  uid,
+  update,
+  activity_uid,
+  name,
+  where,
+  host,
+  start_hour, start_minute,
+  day,
+  weeks,
+  desc,
+  token, callback)
+{
+  for(var i=0; i < arguments.length; i++) {
+    if (i != 2 && arguments[i] == null) {
+      throwParamCheckError(callback)
+      return
+    }
+  }
+  requestAPI(`${apiHost}/group/create_activity?uid=${uid}&update=${update}&activity_uid=${activity_uid}&name=${name}&where=${where}&host=${host}&start_hour=${start_hour}&start_minute=${start_minute}&day=${day}&weeks=${weeks}&desc=${desc}&token=${token}`, callback)
+}
+
+/**
+ * 从群组获取所有活动的接口
+ * @param uid 目标群组的uid
+ * @param day 当前星期
+ */
+module.exports.getActivities = function (uid, day, callback) {
+  if (uid == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/group/get_activities?uid=${uid}&day=${day}`, callback)
+}
+
+/**
+ * 从群组删除活动的接口
+ * @param uid 目标群组的uid
+ * @param token 用于内部认证的唯一凭证
+ */
+module.exports.removeActivity = function (uid, activity_uid, token, callback) {
+  if (uid == null || activity_uid == null || token == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/group/remove_activity?uid=${uid}&activity_uid=${activity_uid}&token=${token}`, callback)
+}
+
+/**
+ * 设置用户的WLAN MAC的接口
+ * @param mac WLAN MAC地址
+ * @param token 用于内部认证的唯一凭证
+ */
+module.exports.updateWlanMAC = function (mac, token, callback) {
+  if (mac == null || token == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/usr/update_wlan_mac?mac=${mac}&token=${token}`, callback)
+}
+
+/**
+ * 获取用户的WLAN MAC的接口
+ * @param token 用于内部认证的唯一凭证
+ */
+module.exports.getWlanMAC = function (token, callback) {
+  if (token == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/usr/get_wlan_mac?token=${token}`, callback)
+}
+
+/**
+ * 获取任务列表
+ * @param token 用于内部认证的唯一凭证
+ */
+module.exports.getTasks = function (token, callback) {
+  if (token == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/usr/tasks?token=${token}`, callback)
+}
+
+/**
+ * 设置签到
+ * @param uid 目标活动的uid
+ * @param start true开始签到，false停止签到
+ */
+module.exports.setSign = function (uid, start, token, callback) {
+  if (uid == null || start == null || token == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/activity/set_sign?uid=${uid}&start=${start}&token=${token}`, callback)
+}
+
 var errDisplayed = false; // 对于多个异步请求同时抛出错误的情况，只反馈最早的错误
 
 /**
@@ -296,6 +412,8 @@ module.exports.showError = function(status) {
         err = '资源未找到'; break;
       case 'E_NETWORK':
         err = '连接失败'; break;
+      case 'E_INVALID_PARAMETER':
+        err = '网络传输错误'; break;
       default:
         err = '操作失败'; break;
     }

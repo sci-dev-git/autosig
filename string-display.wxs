@@ -15,17 +15,26 @@ function cuts(val, len) {
 /**
  * 截取多余的字符串用于显示
  */
-var cutstr = function(val) {
+module.exports.cutstr = function (val) {
   return cuts(val, maxlen);
 }
-
-var cutstr2 = function (val) {
+module.exports.cutstr2 = function (val) {
   return cuts(val, maxlen + extralen + 3); // 包括...符号的3字节
 }
 
-module.exports.cutstr = cutstr
-module.exports.cutstr2 = cutstr2
-
 module.exports.getDayStr = function(daynum) {
   return days[daynum]
+}
+module.exports.listContains = function(targetList, item) {
+  var i = targetList.length;
+  while (i--) {
+    if (targetList[i] == item) return true
+  }
+  return false
+}
+
+module.exports.timestr = function (hour, minute) {
+  var H = (hour<10) ? '0' + hour : hour
+  var S = (minute < 10) ? '0' + minute : minute
+  return H+':'+S
 }

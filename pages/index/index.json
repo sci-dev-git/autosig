@@ -1,7 +1,0 @@
-{
-  "usingComponents": {
-    "sign": "/pages/sign/home/home",
-    "groups": "/pages/groups/groups",
-    "navigator": "/pages/navigator/home/home"
-  }
-}

@@ -35,3 +35,7 @@
   height: 18%;
   border: 1rpx solid var(--cyanLight);
 }
+
+.week-selector-preview {
+  width: 30%;
+}

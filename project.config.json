@@ -44,7 +44,7 @@
 				{
 					"id": -1,
 					"name": "sign",
-					"pathName": "pages/sign/home/home",
+					"pathName": "pages/index/home",
 					"query": "",
 					"scene": null
 				},

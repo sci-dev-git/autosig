@@ -16,12 +16,9 @@
     </view>
   </scroll-view>
 
-  <!--<view class="cu-bar justify-right bg-white">
-    <view class="action border-title">
-      <text class="text-xl text-bold text-blue">加入群组</text>
-      <text class="bg-gradual-blue" style="width:3rem"></text>
-    </view>
-  </view>-->
+  <!--
+  Tab页：加入群组
+  -->
   <block wx:if="{{0==tabCur}}">
 
     <view class="cu-bar bg-white search">
@@ -36,7 +33,7 @@
 
     <scroll-view scroll-y class="indexes" scroll-into-view="indexes-{{listCurID}}" style="height:calc(100vh - {{CustomBar}}px - 50px)" scroll-with-animation="true" enable-back-to-top="true">
       <block wx:if='{{searchContent.length != 0}}'>
-        <view class="cu-bar justify-right bg-white margin-top">
+        <view class="cu-bar bg-white margin-top">
           <view class="action border-title">
             <text class="text-bold text-blue">搜索结果</text>
             <text class="bg-gradual-blue" style="width:3rem"></text>
@@ -66,7 +63,7 @@
       </block>
 
       <block wx:if="{{lenNearbyGroups>0}}">
-        <view class="cu-bar justify-right bg-white margin-top">
+        <view class="cu-bar bg-white margin-top">
           <view class="action border-title">
             <text class="text-bold text-blue">附近的群组</text>
             <text class="bg-gradual-blue" style="width:3rem"></text>
@@ -91,7 +88,7 @@
       </block>
 
       <block wx:if="{{lenAttendedGroups>0}}">
-        <view class="cu-bar justify-right bg-white margin-top">
+        <view class="cu-bar bg-white margin-top">
           <view class="action border-title">
             <text class="text-bold text-blue">已加入的群组 ({{lenAttendedGroups}})</text>
             <text class="bg-gradual-blue" style="width:3rem"></text>
@@ -118,7 +115,33 @@
     </scroll-view>
   </block>
 
+  <!--
+  Tab页：创建群组
+   -->
   <block wx:if="{{1==tabCur}}">
+    <view class="cu-bar bg-white margin-top">
+      <view class="action border-title">
+        <text class="text-bold text-blue">WLAN签到点设置</text>
+        <view class='cuIcon-wifi lg text-blue margin-left'></view>
+        <text class="bg-gradual-blue" style="width:3rem"></text>
+      </view>
+    </view>
+    <form>
+      <view class="cu-form-group">
+        <view class="title">MAC地址：</view>
+        <input value="{{wlanMac}}" placeholder="输入WLAN MAC(如ab:ab:ab:ab:ab:ab)" bindinput="bindWlanMacInput"></input>
+        <text class="lg cuIcon-question" bindtap='onHelpTab'></text>
+      </view>
+      <view wx:if="{{wlanMacOrigin != wlanMac}}" class="cu-form-group">
+        <button class="cu-btn round lines-cyan shadow"role="button"aria-label=""aria-disabled="false" bindtap='onSaveWlanMac'>保存设置</button>
+      </view>
+    </form>
+    <view class="cu-bar bg-white margin-top">
+      <view class="action border-title">
+        <text class="text-bold text-blue">创建</text>
+        <text class="bg-gradual-blue" style="width:3rem"></text>
+      </view>
+    </view>
     <form>
       <view class="cu-form-group">
         <view class="title">名称</view>
@@ -129,13 +152,13 @@
         <view class="title">简介</view>
         <textarea maxlength="100" bindinput="textareaBInput" placeholder="输入群组描述（100字以内）" bindinput="bindGroupDescInput"></textarea>
       </view>
-      <view class="cu-form-group justify-right">
+      <view class="cu-form-group">
         <button class="cu-btn round lines-cyan shadow"role="button"aria-label=""aria-disabled="false" bindtap='onCreateGroup'>创建群组</button>
       </view>
     </form>
 
     <block wx:if="{{lenCreatedGroups>0}}">
-      <view class="cu-bar justify-right bg-white margin-top">
+      <view class="cu-bar bg-white margin-top">
         <view class="action border-title">
           <text class="text-bold text-blue">编辑群组 ({{lenCreatedGroups}})</text>
           <text class="bg-gradual-blue" style="width:3rem"></text>
