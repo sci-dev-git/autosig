@@ -1,6 +1,7 @@
 const app = getApp()
 Page({
   data: {
+    tabCur: 0,
     showSearchResults: false,
     groupName: '测试群组 2',
     groupDesc: 'TFEEWLIGNJERKGJKBFEWBFWLGVNWWL WENFWLJGKWKVL WKNF KGWG W GWGW EWJKFGRGGNWGWB BER,BGL',
@@ -94,15 +95,17 @@ Page({
         wx.hideLoading()
         if (status.code == 0) {
           _this.fetchData()
-          wx.showToast({
-            title: '加入成功',
-            showCancel: false
-          })
         } else {
           api.showError(status)
         }
       }
     )
+  },
+  /**
+   * 切换 标签栏
+   */
+  onTabSwitch: function(e) {
+    this.setData({tabCur: e.currentTarget.dataset.id})
   },
   /**
    * 单击 创建群组

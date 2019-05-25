@@ -9,81 +9,148 @@
 <wxs src="../../string-display.wxs" module="sdisp" />
 
 <view class='box'>
-  <view class="cu-bar justify-right bg-white">
+  <scroll-view scroll-x class="bg-white nav">
+    <view class="flex text-center">
+      <view class="cu-item flex-sub {{0==tabCur?'text-blue cur':''}}" bindtap="onTabSwitch" data-id='{{0}}'>加入群组</view>
+      <view class="cu-item flex-sub {{1==tabCur?'text-blue cur':''}}" bindtap="onTabSwitch" data-id='{{1}}'>创建群组</view>
+    </view>
+  </scroll-view>
+
+  <!--<view class="cu-bar justify-right bg-white">
     <view class="action border-title">
       <text class="text-xl text-bold text-blue">加入群组</text>
       <text class="bg-gradual-blue" style="width:3rem"></text>
     </view>
-  </view>
+  </view>-->
+  <block wx:if="{{0==tabCur}}">
 
-  <view class="cu-bar bg-white search">
-    <view class="search-form">
-      <text class="cuIcon-search"></text>
-      <input type="text" placeholder="输入群组的关键字" confirm-type="search" bindinput='bindSearchInput'></input>
+    <view class="cu-bar bg-white search">
+      <view class="search-form">
+        <text class="cuIcon-search"></text>
+        <input type="text" placeholder="输入群组的关键字" confirm-type="search" bindinput='bindSearchInput'></input>
+      </view>
+      <view class="action">
+        <button class="cu-btn bg-gray.light" bindtap="onSearch">搜索</button>
+      </view>
     </view>
-    <view class="action">
-      <button class="cu-btn bg-gray.light" bindtap="onSearch">搜索</button>
-    </view>
-  </view>
 
-  <scroll-view scroll-y class="indexes" scroll-into-view="indexes-{{listCurID}}" style="height:calc(100vh - {{CustomBar}}px - 50px)" scroll-with-animation="true" enable-back-to-top="true">
-    <block wx:if='{{searchContent.length != 0}}'>
-      <view class="padding indexItem-A" id="0" data-index="0">搜索结果</view>
-      <block wx:if="{{lenSearchResults>0}}">
+    <scroll-view scroll-y class="indexes" scroll-into-view="indexes-{{listCurID}}" style="height:calc(100vh - {{CustomBar}}px - 50px)" scroll-with-animation="true" enable-back-to-top="true">
+      <block wx:if='{{searchContent.length != 0}}'>
+        <view class="cu-bar justify-right bg-white margin-top">
+          <view class="action border-title">
+            <text class="text-bold text-blue">搜索结果</text>
+            <text class="bg-gradual-blue" style="width:3rem"></text>
+          </view>
+        </view>
+        <block wx:if="{{lenSearchResults>0}}">
+          <view class="cu-list menu-avatar no-padding">
+            <block wx:for="{{searchResults}}" wx:key>
+              <view class="cu-item">
+                <view class="cu-avatar round lg">G</view>
+                <view class="content">
+                  <view class="text-grey">
+                    <text class="text-abc">{{searchResults[index].name}}</text>
+                  </view>
+                  <view class="text-gray text-sm">
+                  {{sdisp.cutstr2((searchResults[index].desc.length ? sdisp.cutstr(searchResults[index].desc) + ' ' : '') + searchResults[index].place)}}
+                  </view>
+                </view>
+                <button class="cu-btn bg-gray.light margin-right" data-cur='{{searchResults[index]}}' bindtap="onJoinGroup">加入</button>
+              </view>
+            </block>
+          </view>
+        </block>
+        <block wx:else>
+          <view class="cu-load bg-white {{loading[3] ? 'loading':'over'}}}}"></view>
+        </block>
+      </block>
+
+      <block wx:if="{{lenNearbyGroups>0}}">
+        <view class="cu-bar justify-right bg-white margin-top">
+          <view class="action border-title">
+            <text class="text-bold text-blue">附近的群组</text>
+            <text class="bg-gradual-blue" style="width:3rem"></text>
+          </view>
+        </view>
         <view class="cu-list menu-avatar no-padding">
-          <block wx:for="{{searchResults}}" wx:key>
+          <block wx:for="{{nearbyGroups}}" wx:key>
             <view class="cu-item">
               <view class="cu-avatar round lg">G</view>
-              <view class="content">
+              <view class="content" bindtap='onShowGroupDetail' data-cur='{{nearbyGroups[index]}}'>
                 <view class="text-grey">
-                  <text class="text-abc">{{searchResults[index].name}}</text>
+                  <text class="text-abc">{{nearbyGroups[index].name}}</text>
                 </view>
                 <view class="text-gray text-sm">
-                 {{sdisp.cutstr2((searchResults[index].desc.length ? sdisp.cutstr(searchResults[index].desc) + ' ' : '') + searchResults[index].place)}}
+                  {{sdisp.cutstr2((nearbyGroups[index].desc.length ? sdisp.cutstr(nearbyGroups[index].desc) + ' ' : '') + nearbyGroups[index].place)}}
                 </view>
               </view>
-              <button class="cu-btn bg-gray.light margin-right" data-cur='{{searchResults[index]}}' bindtap="onJoinGroup">加入</button>
+              <button class="cu-btn bg-gray.light margin-right" data-cur='{{nearbyGroups[index]}}' bindtap="onJoinGroup">加入</button>
             </view>
           </block>
         </view>
       </block>
-      <block wx:else>
-        <view class="cu-load bg-white {{loading[3] ? 'loading':'over'}}}}"></view>
-      </block>
-    </block>
 
-    <block wx:if="{{lenNearbyGroups>0}}">
-      <view class="padding indexItem-A" id="0" data-index="0">附近的群组</view>
-      <view class="cu-list menu-avatar no-padding">
-        <block wx:for="{{nearbyGroups}}" wx:key>
-          <view class="cu-item">
-            <view class="cu-avatar round lg">G</view>
-            <view class="content" bindtap='onShowGroupDetail' data-cur='{{nearbyGroups[index]}}'>
-              <view class="text-grey">
-                <text class="text-abc">{{nearbyGroups[index].name}}</text>
-              </view>
-              <view class="text-gray text-sm">
-                {{sdisp.cutstr2((nearbyGroups[index].desc.length ? sdisp.cutstr(nearbyGroups[index].desc) + ' ' : '') + nearbyGroups[index].place)}}
-              </view>
-            </view>
-            <button class="cu-btn bg-gray.light margin-right" data-cur='{{nearbyGroups[index]}}' bindtap="onJoinGroup">加入</button>
+      <block wx:if="{{lenAttendedGroups>0}}">
+        <view class="cu-bar justify-right bg-white margin-top">
+          <view class="action border-title">
+            <text class="text-bold text-blue">已加入的群组 ({{lenAttendedGroups}})</text>
+            <text class="bg-gradual-blue" style="width:3rem"></text>
           </view>
-        </block>
-      </view>
-    </block>
+        </view>
+        <view class="cu-list menu-avatar no-padding">
+          <block wx:for="{{attendedGroups}}" wx:key>
+            <view class="cu-item" bindtap='onOpenAttendedGroupEdit' data-cur='{{attendedGroups[index]}}'>
+              <view class="cu-avatar round lg bg-cyan">G</view>
+              <view class="content">
+                <view class="text-grey">
+                  <text class="text-abc">{{attendedGroups[index].name}}</text>
+                </view>
+                <view class="text-gray text-sm">
+                  {{sdisp.cutstr2((attendedGroups[index].desc.length ? sdisp.cutstr(attendedGroups[index].desc) + ' ' : '') + attendedGroups[index].place)}}
+                </view>
+              </view>
+              <view class='cuIcon-right margin-right'></view>
+            </view>
+          </block>
+        </view>
+      </block>
 
-    <block wx:if="{{lenAttendedGroups>0}}">
-      <view class="padding indexItem-A" id="0" data-index="0">已加入的群组</view>
+    </scroll-view>
+  </block>
+
+  <block wx:if="{{1==tabCur}}">
+    <form>
+      <view class="cu-form-group">
+        <view class="title">名称</view>
+        <input placeholder="输入群组名称" bindinput="bindGroupNameInput"></input>
+        <text class="cuIcon-info"></text>
+      </view>
+      <view class="cu-form-group align-start">
+        <view class="title">简介</view>
+        <textarea maxlength="100" bindinput="textareaBInput" placeholder="输入群组描述（100字以内）" bindinput="bindGroupDescInput"></textarea>
+      </view>
+      <view class="cu-form-group justify-right">
+        <button class="cu-btn round lines-cyan shadow"role="button"aria-label=""aria-disabled="false" bindtap='onCreateGroup'>创建群组</button>
+      </view>
+    </form>
+
+    <block wx:if="{{lenCreatedGroups>0}}">
+      <view class="cu-bar justify-right bg-white margin-top">
+        <view class="action border-title">
+          <text class="text-bold text-blue">编辑群组 ({{lenCreatedGroups}})</text>
+          <text class="bg-gradual-blue" style="width:3rem"></text>
+        </view>
+      </view>
       <view class="cu-list menu-avatar no-padding">
-        <block wx:for="{{attendedGroups}}" wx:key>
-          <view class="cu-item" bindtap='onOpenAttendedGroupEdit' data-cur='{{attendedGroups[index]}}'>
-            <view class="cu-avatar round lg bg-cyan">G</view>
+        <block wx:for="{{createdGroups}}" wx:key>
+          <view class="cu-item" bindtap='onOpenCreatedGroupEdit' data-cur='{{createdGroups[index]}}'>
+            <view class="cu-avatar round lg bg-blue">G</view>
             <view class="content">
               <view class="text-grey">
-                <text class="text-abc">{{attendedGroups[index].name}}</text>
+                <text class="text-abc">{{createdGroups[index].name}}</text>
               </view>
               <view class="text-gray text-sm">
-                {{sdisp.cutstr2((attendedGroups[index].desc.length ? sdisp.cutstr(attendedGroups[index].desc) + ' ' : '') + attendedGroups[index].place)}}
+                {{sdisp.cutstr2((createdGroups[index].desc.length ? sdisp.cutstr(createdGroups[index].desc) + ' ' : '') + createdGroups[index].place)}}
               </view>
             </view>
             <view class='cuIcon-right margin-right'></view>
@@ -91,54 +158,11 @@
         </block>
       </view>
     </block>
-    
-
-  </scroll-view>
-
-  <view class="cu-bar justify-right bg-white margin-top">
-    <view class="action border-title">
-      <text class="text-xl text-bold text-blue">创建群组</text>
-      <text class="bg-gradual-blue" style="width:3rem"></text>
-    </view>
-  </view>
-  <form>
-    <view class="cu-form-group">
-      <view class="title">名称</view>
-      <input placeholder="输入群组名称" bindinput="bindGroupNameInput"></input>
-      <text class="cuIcon-info"></text>
-    </view>
-    <view class="cu-form-group align-start">
-      <view class="title">简介</view>
-      <textarea maxlength="100" bindinput="textareaBInput" placeholder="输入群组描述（100字以内）" bindinput="bindGroupDescInput"></textarea>
-    </view>
-    <view class="cu-form-group justify-right">
-      <button class="cu-btn round lines-cyan shadow"role="button"aria-label=""aria-disabled="false" bindtap='onCreateGroup'>创建群组</button>
-    </view>
-  </form>
-
-  <block wx:if="{{lenCreatedGroups>0}}">
-    <view class="padding indexItem-A" id="0" data-index="0">创建的群组</view>
-    <view class="cu-list menu-avatar no-padding">
-      <block wx:for="{{createdGroups}}" wx:key>
-        <view class="cu-item" bindtap='onOpenCreatedGroupEdit' data-cur='{{createdGroups[index]}}'>
-          <view class="cu-avatar round lg bg-blue">G</view>
-          <view class="content">
-            <view class="text-grey">
-              <text class="text-abc">{{createdGroups[index].name}}</text>
-            </view>
-            <view class="text-gray text-sm">
-              {{sdisp.cutstr2((createdGroups[index].desc.length ? sdisp.cutstr(createdGroups[index].desc) + ' ' : '') + createdGroups[index].place)}}
-            </view>
-          </view>
-          <view class='cuIcon-right margin-right'></view>
-        </view>
-      </block>
-    </view>
   </block>
-  
-</view>
 
-<!-- 群组详情 modal窗口 -->
+</view> <!-- box -->
+
+<!-- modal窗口: 群组详情 -->
 <view class="cu-modal {{showGroupDetails?'show':''}}" bindtap="onHideGroupDetails">
   <view class="cu-dialog">
     <view class="cu-bar bg-white justify-end">
@@ -155,4 +179,4 @@
       </view>
     </view>
   </view>
-</view>
+</view> <!-- modal -->

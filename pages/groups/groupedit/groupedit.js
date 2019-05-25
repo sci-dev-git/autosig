@@ -15,14 +15,24 @@ Page({
     activities: null,
     loading: [false], // memebrs
     groupName: '',
-    groupDesc: ''
+    groupDesc: '',
+    activityName: '',
+    activityTime: '12:00',
+    activityDesc: '',
+    activityWhere: '',
+    activityHost: '',
+    daySelectorCur: 0,
+    scrollLeft: 0,
+    showCreateActivity: false,
+    weekSelected: Array(25),
+    weekModeCur: 0
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-
+    this.switchWeekMode(0)
   },
 
   /**
@@ -182,6 +192,31 @@ Page({
       }
     )
   },
+  /**
+   * Helper函数 - 切换单双周模式
+   */
+  switchWeekMode(mode) {
+    switch (mode) {
+      case 0: // 全部
+        for (var i = 0; i < 25; i++) {
+          var dict = 'weekSelected[' + i + ']'
+          this.setData({ [dict]: true })
+        }
+        break
+      case 1: // 单周
+        for (var i = 1; i <= 25; i++) {
+          var dict = 'weekSelected[' + (i - 1) + ']'
+          this.setData({ [dict]: (i % 2) })
+        }
+        break
+      case 2: // 双周
+        for (var i = 1; i <= 25; i++) {
+          var dict = 'weekSelected[' + (i-1) + ']'
+          this.setData({ [dict]: (i % 2 == 0) })
+        }
+        break
+    }
+  },
 
   /**
    * 单击 退出该群
@@ -241,6 +276,27 @@ Page({
   },
 
   /**
+   * （创建）活动名称输入框内容改变
+   */
+  bindActivityNameInput(e) {
+    this.setData({ activityName: e.detail.value.trim() })
+  },
+  bindActivityTimeChange(e) {
+    this.setData({
+      activityTime: e.detail.value
+    })
+  },
+  bindActivityDescInput(e) {
+    this.setData({ activityDesc: e.detail.value })
+  },
+  bindActivityWhereInput(e) {
+    this.setData({ activityWhere: e.detail.value })
+  },
+  bindActivityHostInput(e) {
+    this.setData({ activityHost: e.detail.value })
+  },
+
+  /**
    * 单击 保存
    */
   onSaveInfo() {
@@ -283,5 +339,42 @@ Page({
           })
         }
       })
+  },
+  /**
+   * 滑动 转换
+   */
+  onDaySelectorTap(e) {
+    this.setData({
+      daySelectorCur: e.currentTarget.dataset.id,
+      scrollLeft: (e.currentTarget.dataset.id - 1) * 60
+    })
+  },
+  /**
+   * 单击 添加（活动）
+   */
+  onCreateActivity() {
+    this.setData({ showCreateActivity: true })
+  },
+  /**
+   * 关闭 添加活动对话框
+   */
+  onHideCreateActivity() {
+    this.setData({ showCreateActivity: false })
+  },
+  /**
+   * 在周数选择器上单击的事件
+   */
+  onWeekTap(e) {
+    var weekId = e.currentTarget.dataset.cur;
+    var dict = 'weekSelected[' + weekId + ']'
+    this.setData({ [dict]: !(this.data.weekSelected[weekId]) })
+  },
+  /**
+   * 改变单双周模式
+   */
+  onSwitchWeekMode(e) {
+    var mode = e.currentTarget.dataset.mode
+    this.switchWeekMode(mode)
+    this.setData({ weekModeCur: mode })
   }
 })

@@ -11,3 +11,27 @@
   justify-content: left;
   align-items:center;
 }
+
+.create-act-size {
+  height: 800rpx;
+}
+
+.tbl-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  align-items:left;
+}
+
+.tbl-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  align-items:center;
+}
+
+.tb-block {
+  width: 18%;
+  height: 18%;
+  border: 1rpx solid var(--cyanLight);
+}

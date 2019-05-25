@@ -28,3 +28,9 @@
 .grid.col-7>view {
 	width: 14.28%;
 }
+
+.right-align {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}

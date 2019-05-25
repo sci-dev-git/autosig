@@ -1,10 +1,13 @@
 <cu-custom bgColor="bg-gradual-blue" isBack='true'>
-  <view slot="content">编辑群组</view>
+  <view wx:if="{{manageGroup}}" slot="content">管理群组</view>
+  <view wx:else slot="content">查看群组</view>
   <view slot="backText">返回</view>
   <view class="action" slot="right">
     <view class="cu-load load-icon {{loading[0]?'loading':'over'}}"></view>
   </view>
 </cu-custom>
+
+<wxs src="../../../string-display.wxs" module="sdisp" />
 
 <block wx:if="{{manageGroup}}">
   <form>
@@ -18,14 +21,14 @@
       <textarea value="{{currentGroup.desc.length ? currentGroup.desc : '无'}}" maxlength="100" bindinput="textareaBInput" placeholder="输入群组描述（100字以内）" bindinput="bindGroupDescInput"></textarea>
     </view>
     <view class="cu-form-group justify-right align-center">
-      <button class="cu-btn round lines-cyan shadow"role="button"aria-label=""aria-disabled="false" bindtap='onSaveInfo'>保存</button>
+      <view class="cu-btn cuIcon-post round lines-cyan" role="button"aria-label=""aria-disabled="false" bindtap='onSaveInfo'>保存</view>
       <view class="cu-capsule radius bg-cyan">
         <view class="cu-tag bg-gray">地点</view>
         <view class="cu-tag line-white">{{currentGroup.place}}</view>
       </view>
     </view>
   </form>
-</block>
+</block> <!--manageGroup-->
 <block wx:else>
   <view class="padding edit-panel solid-bottom">
     <view>{{currentGroup.name}}</view>
@@ -47,7 +50,20 @@
 </view>
 
 <block wx:if="{{manageGroup}}">
-  <view class="padding indexItem-A" id="0" data-index="0">管理活动 ({{lenActivities}})</view>
+  <view class="cu-bar justify-right bg-white margin-top">
+    <view class="action border-title">
+      <text class="text-bold text-blue">管理活动 ({{lenActivities}})</text>
+      <text class="bg-gradual-blue" style="width:3rem"></text>
+    </view>
+  </view>
+  <scroll-view scroll-x class="bg-white nav" scroll-with-animation scroll-left="{{scrollLeft}}">
+    <view class="cu-item {{index==daySelectorCur?'text-green cur':''}}" wx:for="{{7}}" wx:key bindtap="onDaySelectorTap" data-id="{{index}}">
+      周{{sdisp.getDayStr(index)}}
+    </view>
+  </scroll-view>
+  <view class='padding bg-white'>
+    <button class='cu-btn cuIcon-add round lines-cyan' bindtap='onCreateActivity'>添加</button>
+  </view>
   <block wx:if="{{lenActivities>0}}">
   <view class="cu-list menu-avatar no-padding">
     <block wx:for="{{activities}}" wx:key>
@@ -63,14 +79,19 @@
       </view>
     </block>
   </view>
-</block>
+</block> <!--manageGroup-->
 <block wx:else>
   <view class="cu-load bg-white {{loading[0] ? 'loading':'over'}}}}"></view>
 </block>
 
 </block>
 
-<view class="padding indexItem-A" id="0" data-index="0">{{(manageGroup?'管理':'')+'群成员 ('+lenMembers+')'}}</view>
+<view class="cu-bar justify-right bg-white margin-top">
+  <view class="action border-title">
+    <text class="text-bold text-blue">{{(manageGroup?'管理':'')+'群成员 ('+lenMembers+')'}}</text>
+    <text class="bg-gradual-blue" style="width:3rem"></text>
+  </view>
+</view>
 <block wx:if="{{lenMembers>0}}">
   <view class="cu-list menu-avatar no-padding">
     <block wx:for="{{members}}" wx:key>
@@ -89,3 +110,71 @@
 <block wx:else>
   <view class="cu-load bg-white {{loading[0] ? 'loading':'over'}}}}"></view>
 </block>
+
+<!-- modal窗口: 添加活动 -->
+<view class="cu-modal {{showCreateActivity?'show':''}}">
+  <view class="cu-dialog">
+    <view class="cu-bar bg-white justify-end">
+        <view class="content">添加活动</view>
+        <view class="action" bindtap="onHideCreateActivity">
+          <text class="cuIcon-close text-red"></text>
+        </view>
+      </view>
+
+    <scroll-view scroll-y class='create-act-size'>
+      <view class="padding">
+        <form>
+          <view class="cu-form-group">
+            <view class="title">名称</view>
+            <input placeholder="输入活动名称" bindinput="bindActivityNameInput"></input>
+            <text class="cuIcon-edit"></text>
+          </view>
+          <view class="cu-form-group">
+            <view class="title">时间 / 周数</view>
+            <picker mode="time" value="{{activityTime}}" start="05:00" end="23:00" bindchange="onActivityTimeChange">
+              <view class="picker">
+                {{activityTime}}
+              </view>
+            </picker>
+          </view>
+          <view class="cu-form-group">
+            <scroll-view scroll-x class="bg-white nav text-center">
+              <view class="cu-item {{0==weekModeCur?'bg-cyan.light cur':''}}" bindtap="onSwitchWeekMode" data-mode="{{0}}">全部</view>
+              <view class="cu-item {{1==weekModeCur?'bg-cyan.light cur':''}}" bindtap="onSwitchWeekMode" data-mode="{{1}}">单周</view>
+              <view class="cu-item {{2==weekModeCur?'bg-cyan.light cur':''}}" bindtap="onSwitchWeekMode" data-mode="{{2}}">双周</view>
+            </scroll-view>
+          </view>
+          <view class="cu-form-group align-start">
+            <view class='cu-list grid col-5 no-border'>
+              <block wx:for="{{25}}" wx:for-index="week" wx:key>
+                <text class="tb-block {{weekSelected[week] ? 'bg-cyan' : 'bg-white'}}" bindtap='onWeekTap' data-cur='{{week}}'>{{week+1}}</text>
+              </block>
+            </view>
+          </view>
+          <view class="cu-form-group align-start">
+            <view class="title">地点</view>
+            <text  maxlength="100" bindinput="bindActivityWhereInput" placeholder="输入活动地点" bindinput="bindActivityWhereInput"></text>
+          </view>
+          <view class="cu-form-group align-start">
+            <view class="title">主讲</view>
+            <text  maxlength="100" bindinput="bindActivityHostInput" placeholder="输入活动主讲" bindinput="bindActivityHostInput"></text>
+          </view>
+          <view class="cu-form-group align-start">
+            <view class="title">简介</view>
+            <textarea  maxlength="100" bindinput="bindActivityDescInput" placeholder="输入活动描述（100字以内）" bindinput="bindActivityDescInput"></textarea>
+          </view>
+          <view class="cu-form-group right-align align-center">
+            <view class="cu-capsule radius bg-cyan">
+              <view class="cu-tag bg-gray">地点</view>
+              <view class="cu-tag line-white">{{currentGroup.place}}</view>
+            </view>
+          </view>
+          <view class="padding">
+            <button class="cu-btn block bg-blue.light margin-tb-sm lg" type="">创建</button>
+          </view>
+        </form>
+      </view>
+    </scroll-view>
+    <text class='cuIcon-refresharrow text-gray margin'> 向下拖动</text>
+  </view>
+</view>

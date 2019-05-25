@@ -1,11 +1,14 @@
-<cu-custom bgColor="bg-gradual-blue">
+<cu-custom class='text-white'>
   <view slot="content">独步校园</view>
 </cu-custom>
-
 <view class='box'>
   <view class='UCenter-bg bg-gradual-blue'>
-    <view class="flex justify-center">
+    <cu-custom>
+      <view slot="content"></view> <!-- placeholder -->
+    </cu-custom>
 
+    <view class="margin flex justify-center">
+        
         <block wx:if="{{hasUserInfo && !authRequired}}">
           <view class='text-center'>
             <view class="cu-avatar xl round solids" bindtap='onAvatarTap' style="background-image:url({{userInfo.avatarUrl}})"></view>
@@ -25,7 +28,7 @@
     </view>
   </view>
   
-  <view class="flex text-center text-grey bg-white shadow-warp align-center infoSize">
+  <view class="flex text-center text-grey bg-white shadow-warp infoSize">
     <view class="flex flex-sub flex-direction solid-right">
       <view class="text-xxl text-orange">{{taskTotal}}</view>
       <view class="margin-top-sm">
@@ -154,11 +157,9 @@
 
   <block wx:if="{{loginState == 1 && !attendedGroup}}">
     <view class='goto-group'>
-      <image mode='top' src='/assets/attendedGroup.png'></image>
-      <text>哎呀，你还没有加入任何群组！</text>
-      <view class="margin-tb-sm text-center"role=""aria-label="">
-        <button class="cu-btn round lines-cyan shadow"role="button"aria-label=""aria-disabled="false" bindtap='onAddGroup'>加入群组</button>
-      </view>
+      <image mode='aspectFit' src='/assets/attendedGroup.png'></image>
+      <text class='margin'>哎呀，你还没有加入任何群组！</text>
+      <button class="cu-btn margin-tb-sm round lines-cyan shadow"role="button"aria-label=""aria-disabled="false" bindtap='onAddGroup'>加入群组</button>
     </view>
   </block>
 
