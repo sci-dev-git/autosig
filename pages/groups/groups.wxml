@@ -173,7 +173,7 @@
     </view>
     <view class="padding-xl">
       <view>简介：{{currentGroup.desc.length ? currentGroup.desc : '无'}}</view>
-      <view class="cu-capsule radius bg-cyan margin-top">
+      <view class="cu-capsule bg-cyan margin-top">
         <view class="cu-tag bg-gray">地点</view>
         <view class="cu-tag line-white">{{currentGroup.place}}</view>
       </view>

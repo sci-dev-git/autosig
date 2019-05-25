@@ -167,6 +167,18 @@ Component({
       } else {
         this.setData({ toolbarForwardHint: '>' })
       }
-    }
+    },
+
+    /**
+     * 单击 主导航栏
+     */
+    onMainNaviTap(e) {
+      var index = e.currentTarget.dataset.id
+      switch(index) {
+        case 0:
+          this.triggerEvent('gotogroup', {})
+          break;
+      }
+    },
   }
 })

@@ -15,8 +15,8 @@
 
 const app = getApp()
 
-//const apiHost = "https://autosigs.applinzi.com";
-const apiHost = "http://localhost:5050"; // for debug
+const apiHost = "https://autosigs.applinzi.com";
+//const apiHost = "http://localhost:5050"; // for debug
 
 function requestAPI(url, callback, opaque) {
   wx.request({

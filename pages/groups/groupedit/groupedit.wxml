@@ -8,39 +8,50 @@
 </cu-custom>
 
 <wxs src="../../../string-display.wxs" module="sdisp" />
+<template name='place-capsule'>
+  <view class="cu-capsule bg-cyan">
+    <view class="cu-tag bg-gray">地点</view>
+    <view class="cu-tag line-white">{{currentPlace.length ? currentPlace : '无'}}</view>
+  </view>
+</template>
 
-<block wx:if="{{manageGroup}}">
+<view wx:if="{{manageGroup}}">
   <form>
     <view class="cu-form-group">
       <view class="title">名称</view>
-      <input value="{{currentGroup.name}}" placeholder="输入群组名称" bindinput="bindGroupNameInput"></input>
-      <text class="cuIcon-edit"></text>
+      <input value="{{currentGroup.name}}" placeholder="输入群组名称" disabled='{{!groupEditMode}}' bindinput="bindGroupNameInput"></input>
+      <text wx:if="{{groupEditMode}}" class="cuIcon-edit"></text>
     </view>
-    <view class="cu-form-group align-start">
+    
+    <view class="cu-form-group {{!groupEditMode?'align-baseline':'align-start'}}">
       <view class="title">简介</view>
-      <textarea value="{{currentGroup.desc.length ? currentGroup.desc : '无'}}" maxlength="100" bindinput="textareaBInput" placeholder="输入群组描述（100字以内）" bindinput="bindGroupDescInput"></textarea>
+      <!-- FIXME: focus: seems a bug of wx native widget -->
+      <block wx:if="{{!groupEditMode}}">
+        <input value="{{currentGroup.desc.length ? currentGroup.desc : '无'}}" disabled='true'></input>
+      </block>
+      <block wx:else>
+        <textarea value="{{currentGroup.desc.length ? currentGroup.desc : '无'}}" maxlength="100" placeholder="输入群组描述（100字以内）" disabled='{{!groupEditMode}}' bindinput="bindGroupDescInput"></textarea>
+      </block>
     </view>
+    
     <view class="cu-form-group justify-right align-center">
-      <view class="cu-btn cuIcon-post round lines-cyan" role="button"aria-label=""aria-disabled="false" bindtap='onSaveInfo'>保存</view>
-      <view class="cu-capsule radius bg-cyan">
-        <view class="cu-tag bg-gray">地点</view>
-        <view class="cu-tag line-white">{{currentGroup.place}}</view>
+      <view>
+        <view class="cu-btn cuIcon-post round lines-cyan" role="button"aria-label=""aria-disabled="false" bindtap='onSaveInfo'>{{groupEditMode?'保存':'编辑'}}</view>
+        <view class="cu-btn cuIcon-close round lines-cyan margin-left" role="button"aria-label=""aria-disabled="false" wx:if="{{groupEditMode}}" bindtap='onCloseInfoEdit'></view>
       </view>
+      <template is='place-capsule'/>
     </view>
   </form>
-</block> <!--manageGroup-->
-<block wx:else>
+</view> <!--manageGroup-->
+<view wx:else>
   <view class="padding edit-panel solid-bottom">
-    <view>{{currentGroup.name}}</view>
+    <view>名称：{{currentGroup.name.length ? currentGroup.name : '加载中...'}}</view>
   </view>
   <view class="padding bg-white">
     <view>简介：{{currentGroup.desc.length ? currentGroup.desc : '无'}}</view>
-    <view class="cu-capsule radius bg-cyan margin-top">
-      <view class="cu-tag bg-gray">地点</view>
-      <view class="cu-tag line-white">{{currentGroup.place}}</view>
-    </view>
+    <view class='margin-top'><template is='place-capsule'/></view>
   </view>
-</block>
+</view>
 
 <view wx:if="{{manageGroup}}" class="padding flex flex-direction">
   <button class="cu-btn bg-red margin-tb-sm lg" bindtap='onRemoveGroup'>删除该群</button>
@@ -115,66 +126,68 @@
 <view class="cu-modal {{showCreateActivity?'show':''}}">
   <view class="cu-dialog">
     <view class="cu-bar bg-white justify-end">
-        <view class="content">添加活动</view>
-        <view class="action" bindtap="onHideCreateActivity">
-          <text class="cuIcon-close text-red"></text>
-        </view>
+      <view class="content">添加活动</view>
+      <view class="action" bindtap="onHideCreateActivity">
+        <text class="cuIcon-close text-red"></text>
       </view>
+    </view>
 
-    <scroll-view scroll-y class='create-act-size'>
-      <view class="padding">
-        <form>
-          <view class="cu-form-group">
-            <view class="title">名称</view>
-            <input placeholder="输入活动名称" bindinput="bindActivityNameInput"></input>
-            <text class="cuIcon-edit"></text>
-          </view>
-          <view class="cu-form-group">
-            <view class="title">时间 / 周数</view>
-            <picker mode="time" value="{{activityTime}}" start="05:00" end="23:00" bindchange="onActivityTimeChange">
-              <view class="picker">
-                {{activityTime}}
+    <!-- FIXME wx:if : seems a bug of wx native widget -->
+    <block wx:if='{{showCreateActivity}}'>
+      <scroll-view scroll-y bindscroll='onModalScroll' class='create-act-size'>
+        <view class="padding">
+          <form>
+            <view class="cu-form-group">
+              <view class="title">名称</view>
+              <input disabled='{{!showCreateActivity}}' placeholder="输入活动名称" bindinput="bindActivityNameInput"></input>
+              <text class="cuIcon-edit"></text>
+            </view>
+            <view class="cu-form-group">
+              <view class="title">时间 / 周数</view>
+              <picker mode="time" value="{{activityTime}}" start="05:00" end="23:00" bindchange="onActivityTimeChange">
+                <view class="picker">
+                  {{activityTime}}
+                </view>
+              </picker>
+            </view>
+            <view class="cu-form-group">
+              <scroll-view scroll-x class="bg-white nav text-center">
+                <view class="cu-item {{0==weekModeCur?'bg-cyan.light cur':''}}" bindtap="onSwitchWeekMode" data-mode="{{0}}">全部</view>
+                <view class="cu-item {{1==weekModeCur?'bg-cyan.light cur':''}}" bindtap="onSwitchWeekMode" data-mode="{{1}}">单周</view>
+                <view class="cu-item {{2==weekModeCur?'bg-cyan.light cur':''}}" bindtap="onSwitchWeekMode" data-mode="{{2}}">双周</view>
+              </scroll-view>
+            </view>
+            <view class="cu-form-group align-start">
+              <view class='cu-list grid col-5 no-border'>
+                <block wx:for="{{25}}" wx:for-index="week" wx:key>
+                  <text class="tb-block {{weekSelected[week] ? 'bg-cyan' : 'bg-white'}}" bindtap='onWeekTap' data-cur='{{week}}'>{{week+1}}</text>
+                </block>
               </view>
-            </picker>
-          </view>
-          <view class="cu-form-group">
-            <scroll-view scroll-x class="bg-white nav text-center">
-              <view class="cu-item {{0==weekModeCur?'bg-cyan.light cur':''}}" bindtap="onSwitchWeekMode" data-mode="{{0}}">全部</view>
-              <view class="cu-item {{1==weekModeCur?'bg-cyan.light cur':''}}" bindtap="onSwitchWeekMode" data-mode="{{1}}">单周</view>
-              <view class="cu-item {{2==weekModeCur?'bg-cyan.light cur':''}}" bindtap="onSwitchWeekMode" data-mode="{{2}}">双周</view>
-            </scroll-view>
-          </view>
-          <view class="cu-form-group align-start">
-            <view class='cu-list grid col-5 no-border'>
-              <block wx:for="{{25}}" wx:for-index="week" wx:key>
-                <text class="tb-block {{weekSelected[week] ? 'bg-cyan' : 'bg-white'}}" bindtap='onWeekTap' data-cur='{{week}}'>{{week+1}}</text>
-              </block>
             </view>
-          </view>
-          <view class="cu-form-group align-start">
-            <view class="title">地点</view>
-            <text  maxlength="100" bindinput="bindActivityWhereInput" placeholder="输入活动地点" bindinput="bindActivityWhereInput"></text>
-          </view>
-          <view class="cu-form-group align-start">
-            <view class="title">主讲</view>
-            <text  maxlength="100" bindinput="bindActivityHostInput" placeholder="输入活动主讲" bindinput="bindActivityHostInput"></text>
-          </view>
-          <view class="cu-form-group align-start">
-            <view class="title">简介</view>
-            <textarea  maxlength="100" bindinput="bindActivityDescInput" placeholder="输入活动描述（100字以内）" bindinput="bindActivityDescInput"></textarea>
-          </view>
-          <view class="cu-form-group right-align align-center">
-            <view class="cu-capsule radius bg-cyan">
-              <view class="cu-tag bg-gray">地点</view>
-              <view class="cu-tag line-white">{{currentGroup.place}}</view>
+            <view class="cu-form-group align-start">
+              <view class="title">地点</view>
+              <text maxlength="100" disabled='{{!showCreateActivity}}' bindinput="bindActivityWhereInput" placeholder="输入活动地点" bindinput="bindActivityWhereInput"></text>
             </view>
-          </view>
-          <view class="padding">
-            <button class="cu-btn block bg-blue.light margin-tb-sm lg" type="">创建</button>
-          </view>
-        </form>
-      </view>
-    </scroll-view>
-    <text class='cuIcon-refresharrow text-gray margin'> 向下拖动</text>
+            <view class="cu-form-group align-start">
+              <view class="title">主讲</view>
+              <text  maxlength="100" disabled='{{!showCreateActivity}}' bindinput="bindActivityHostInput" placeholder="输入活动主讲" bindinput="bindActivityHostInput"></text>
+            </view>
+            <view class="cu-form-group align-start">
+              <view class="title">简介</view>
+              <!-- FIXME disabled : seems a bug of wx native widget -->
+              <textarea maxlength="100" disabled='{{!showCreateActivity}}'  bindinput="bindActivityDescInput" placeholder="输入活动描述（100字以内）" bindinput="bindActivityDescInput"></textarea>
+            </view>
+            <view class="cu-form-group right-align align-center">
+              <template is='place-capsule'/>
+            </view>
+            <view class="padding">
+              <button class="cu-btn block bg-blue.light margin-tb-sm lg" bindtap='onCreateGroup'>创建</button>
+            </view>
+          </form>
+        </view>
+      </scroll-view>
+      <text class='cuIcon-refresharrow text-gray margin'> 向下拖动</text>
+    </block>
+
   </view>
 </view>

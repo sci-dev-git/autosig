@@ -8,12 +8,14 @@ Page({
    */
   data: {
     currentGroup: null,
+    currentPlace: '',
     manageGroup: false,
     lenMembers: 0,
     members: null,
     lenActivities: 0,
     activities: null,
     loading: [false], // memebrs
+    groupEditMode: false,
     groupName: '',
     groupDesc: '',
     activityName: '',
@@ -90,6 +92,7 @@ Page({
   fetchData() {
     this.setData({
       currentGroup: app.globalData.groupedit_currentGroup,
+      currentPlace: app.globalData.asusrInfo.place,
       manageGroup: app.globalData.groupedit_manageGroup,
       groupName: app.globalData.groupedit_currentGroup.name,
       groupDesc: app.globalData.groupedit_currentGroup.desc,
@@ -300,45 +303,58 @@ Page({
    * 单击 保存
    */
   onSaveInfo() {
-    var err = null
-    if (this.data.groupName.length == 0)
-      err = '群名称不能为空'
-    else if (this.data.groupDesc > 100)
-      err = '群描述不能超过100字'
-    if (err != null) {
-      wx.showModal({
-        title: '请完善信息',
-        content: err,
-        showCancel: false
+    if (this.data.groupEditMode) {
+      var err = null
+      if (this.data.groupName.length == 0)
+        err = '群名称不能为空'
+      else if (this.data.groupDesc > 100)
+        err = '群描述不能超过100字'
+      if (err != null) {
+        wx.showModal({
+          title: '请完善信息',
+          content: err,
+          showCancel: false
+        })
+        return
+      }
+      wx.showLoading({
+        title: '请稍后',
       })
-      return
-    }
-    wx.showLoading({
-      title: '请稍后',
-    })
-    var _this = this
-    api.updateGroupInfo(
-      this.data.currentGroup.uid,
-      this.data.groupName,
-      this.data.groupDesc,
-      app.globalData.token,
+      var _this = this
+      api.updateGroupInfo(
+        this.data.currentGroup.uid,
+        this.data.groupName,
+        this.data.groupDesc,
+        app.globalData.token,
 
-      function (status, data) {
-        wx.hideLoading()
-        if (status.code == 0) {
-          app.globalData.groupedit_fetchData()
-          wx.showToast({
-            title: '修改成功',
-            showCancel: false
-          })
-        } else {
-          api.showError(status)
-          this.setData({
-            groupName: app.globalData.groupedit_currentGroup.name,
-            groupDesc: app.globalData.groupedit_currentGroup.desc,
-          })
-        }
-      })
+        function (status, data) {
+          wx.hideLoading()
+          if (status.code == 0) {
+            _this.setData({ // 同步数据
+              'currentGroup.name': _this.data.groupName,
+              'currentGroup.desc': _this.data.groupDesc
+            })
+            app.globalData.groupedit_fetchData()
+            wx.showToast({
+              title: '修改成功',
+              showCancel: false
+            })
+          } else {
+            api.showError(status)
+            this.setData({
+              groupName: app.globalData.groupedit_currentGroup.name,
+              groupDesc: app.globalData.groupedit_currentGroup.desc,
+            })
+          }
+        })
+    }
+    this.setData({ groupEditMode: !this.data.groupEditMode })
+  },
+  /**
+   * 单击 关闭
+   */
+  onCloseInfoEdit() {
+    this.setData({ groupEditMode: false })
   },
   /**
    * 滑动 转换
@@ -353,6 +369,7 @@ Page({
    * 单击 添加（活动）
    */
   onCreateActivity() {
+    this.onCloseInfoEdit()
     this.setData({ showCreateActivity: true })
   },
   /**
@@ -376,5 +393,11 @@ Page({
     var mode = e.currentTarget.dataset.mode
     this.switchWeekMode(mode)
     this.setData({ weekModeCur: mode })
+  },
+  /**
+   * 单击创建群组按钮
+   */
+  onCreateGroup() {
+
   }
 })
