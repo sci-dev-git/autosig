@@ -71,7 +71,7 @@
     </view>
   </view>
   <scroll-view scroll-x class="bg-white nav" scroll-with-animation scroll-left="{{scrollLeft}}">
-    <view class="cu-item {{index==daySelectorCur?'text-green cur':''}}" wx:for="{{6}}" wx:key bindtap="onDaySelectorTap" data-id="{{index}}">
+    <view class="cu-item {{index==daySelectorCur?'text-green cur':''}}" wx:for="{{7}}" wx:key bindtap="onDaySelectorTap" data-id="{{index}}">
       周{{sdisp.getDayStr(index)}}
     </view>
   </scroll-view>
@@ -80,11 +80,16 @@
     <view class="cu-list menu no-padding margin-top-sm " wx:for="{{activities}}" wx:key>
       <view class="cu-item">
         <view class="text-grey flex flex-direction">
-          <text class="margin-top-sm text-abc flex-sub">名称：{{activities[index].name}}</text>
+          <!--<text class="margin-top-sm text-abc flex-sub">名称：{{activities[index].name}}</text>
           <text class="margin-top-sm text-abc flex-sub">地点：{{activities[index].where}}</text>
           <text class="margin-top-sm text-abc flex-sub">主讲：{{activities[index].host}}</text>
           <text class="margin-top-sm text-abc flex-sub">时间：{{sdisp.timestr(activities[index].startHour, activities[index].startMinute)}}</text>
-          <text class="margin-top-sm margin-bottom-sm text-abc flex-sub">简介：{{activities[index].desc.length?activities[index].desc:'无'}}</text>
+          <text class="margin-top-sm margin-bottom-sm text-abc flex-sub">简介：{{activities[index].desc.length?activities[index].desc:'无'}}</text>-->
+          <input value="名称：{{activities[index].name}}" disabled='true'></input>
+          <input value="地点：{{activities[index].where}}" disabled='true'></input>
+          <input value="主讲：{{activities[index].host}}" disabled='true'></input>
+          <input value="时间：{{sdisp.timestr(activities[index].startHour, activities[index].startMinute)}}" disabled='true'></input>
+          <input value="简介：{{activities[index].desc.length?activities[index].desc:'无'}}" disabled='true'></input>
         </view>
         <view class='cu-list grid col-5 no-border week-selector-preview' data-cur="{{activities[index]}}" bindtap='onEditActivityTap'>
           <block wx:for="{{25}}" wx:for-index="week" wx:key>
@@ -154,7 +159,7 @@
               <text class="cuIcon-edit"></text>
             </view>
             <view class="cu-form-group">
-              <view class="title">时间 / 周数</view>
+              <view class="title">星期{{sdisp.getDayStr(daySelectorCur)}} / 周数</view>
               <picker mode="time" value="{{activityTime}}" start="05:00" end="23:00" bindchange="onActivityTimeChange">
                 <view class="picker">
                   {{activityTime}}

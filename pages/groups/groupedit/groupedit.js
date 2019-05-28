@@ -15,7 +15,7 @@ Page({
     members: null,
     lenActivities: 0,
     activities: null,
-    loading: [true, true], // memebrs, activities
+    loading: [false, false], // memebrs, activities
     groupEditMode: false,
     groupName: '',
     groupDesc: '',
@@ -130,6 +130,20 @@ Page({
       function (status, data) {
         _this.setData({ 'loading[1]': false })
         if (status.code == 0) {
+          // 对活动时间排序
+          for (var i = 0; i < data.size; i++) {
+            for (var j = i + 1; j < data.size; j++) {
+              var H = data.activities[i].startHour;
+              var M = data.activities[i].startMinute;
+              var mH = data.activities[j].startHour;
+              var mM = data.activities[j].startMinute;
+              if (app.globalData.util.compareTime([H, M], [mH, mM]) > 0) {
+                var tmp = data.activities[i]
+                data.activities[i] = data.activities[j]
+                data.activities[j] = tmp
+              }
+            }
+          }
           _this.setData({
             lenActivities: data.size,
             activities: data.activities
@@ -301,6 +315,14 @@ Page({
       }
     }
     this.setData({ weekModeCur: even && odd ? 0 : (odd ? 1 : 2) })
+  },
+
+  /**
+   * 页面相关事件处理函数--监听用户下拉动作
+   */
+  onPullDownRefresh: function () {
+    this.fetchData()
+    wx.stopPullDownRefresh()
   },
 
   /**

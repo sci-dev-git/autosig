@@ -1,11 +1,15 @@
 <cu-custom bgColor="{{showCustomBarBg?'bg-gradual-blue':''}}" class="text-white">
   <view slot="content">独步校园</view>
-  <view class="action" slot="right">
-    <view class="cu-load load-icon {{loading[0]?'loading':'over'}}"></view>
-  </view>
 </cu-custom>
 
 <wxs src="../../string-display.wxs" module="sdisp" />
+
+<template name='loadingIndicator'>
+  <view class="flex flex-direction align-center">
+    <w-indicator show color="#1cbbb4" type="catapult" />
+    <text class='margin-top'>{{text}}</text>
+  </view>
+</template>
 
 <scroll-view scroll-y bindscroll='onMainScroll' class='main-scroll'>
   <view class='box'>
@@ -23,12 +27,19 @@
             </view>
           </block>
           <block wx:if="{{!hasUserInfo && !authRequired}}">
-            <text>加载中……</text>
+            <text>读取中</text>
           </block>
-          <block wx:if="{{authRequired}}">
+
+          <block wx:if="{{loginState == 2 && authRequired}}">
             <view class='text-center'>
               <image class="cu-avatar xl round solids" bindtap='onAvatarTap' src="/assets/avatar-default.png"></image>
-              <view class="padding nickName">游客，您好</view>
+              <view class="padding nickName">您好，请先完善个人信息</view>
+            </view>
+          </block>
+
+          <block wx:if="{{loginState == 1 && authRequired}}">
+            <view class='text-center'>
+              <button class="cu-btn round lines-white shadow size" role="button" open-type="getUserInfo" bindgetuserinfo="onRegetUserInfo"> 重新获取头像</button>
             </view>
           </block>
         
@@ -37,9 +48,9 @@
     
     <view class="flex text-center text-grey bg-white shadow-warp infoSize">
       <view class="flex flex-sub flex-direction solid-right">
-        <view class="text-xxl text-orange">{{taskTotal}}</view>
+        <view class="text-xxl text-orange">{{taskTodo}}</view>
         <view class="margin-top-sm">
-          <text class="cuIcon-attentionfill"></text> 总任务
+          <text class="cuIcon-attentionfill"></text> 待完成
         </view>
       </view>
       <scroll-view scroll-x class='mainNavi' bindscroll='onToolbarScroll'>
@@ -58,11 +69,12 @@
     </view>
 
     <block wx:if="{{loginState == 0}}">
+      <template is='loadingIndicator' data="{{text:'登陆中，请稍后',swt:true}}"/>
     </block>
     <block wx:if="{{loginState == 1 && attendedGroup || loginState == 2 }}">
       <view class='sign-scroll-view'>
         <view class="cu-timeline sign-timeline">
-          <view class="cu-time font-size">今日任务</view>
+          <view class="cu-time font-size" bindtap='fetchData'>今日任务</view>
           
           <block wx:if="{{loginState == 1 && attendedGroup}}">
             <block wx:for="{{tasks}}" wx:key>
@@ -75,13 +87,15 @@
                     </view>
                     
                     <view class='margin-top margin-right'>{{tasks[index].activity.desc}}</view>
+                    <view class='margin-top-sm margin-right'>地点：{{tasks[index].activity.where}}</view>
+                    <view class='margin-top-sm margin-right'>主讲：{{tasks[index].activity.host}}</view>
                     <view class='right-align'>
                       <view>
                         <block wx:if="{{tasks[index].managed}}">
                           <button class="cu-btn bg-red.light radius shadow tl-button-sign" data-task="{{tasks[index]}}" bindtap='onSetSign'>{{tasks[index].activity.signStarted?'结束签到':'发起签到'}}</button>
                         </block>
                         <block wx:else>
-                          <button wx:if="{{tasks[index].activity.signStarted}}" class="bg-cyan.light cuIcon-post radius shadow tl-button-sign" data-activity="{{tasks[index]}}">签到</button>
+                          <button wx:if="{{tasks[index].activity.signStarted && !tasks[index].signed}}" class="bg-cyan.light cuIcon-post radius shadow tl-button-sign" data-task="{{tasks[index]}}" bindtap='onSignin'>签到</button>
                         </block>
                       </view>
                     </view>
@@ -89,6 +103,15 @@
                   </view>
                 </view>
             </block>
+
+            <block wx:if="{{lenTasks==0}}">
+              <view class='cu-item'>
+                <view class="bg-cyan radius shadow-blur content">
+                  <text class='cu-load over'></text>
+                </view>
+              </view>
+            </block>
+
           </block>
           
           <block wx:if="{{loginState == 2}}">
@@ -115,7 +138,11 @@
       </view>
     </block>
 
-    <block wx:if="{{loginState == 1 && !attendedGroup}}">
+    <block wx:if="{{loginState == 1 && loading[0]}}">
+      <template is='loadingIndicator' data="{{text:'加载中，请稍后'}}"/>
+    </block>
+
+    <block wx:if="{{loginState == 1 && !loading[0] && !attendedGroup}}">
       <view class='goto-group'>
         <image mode='aspectFit' src='/assets/attendedGroup.png'></image>
         <text class='margin'>哎呀，你还没有加入任何群组！</text>

@@ -1,4 +1,7 @@
 const app = getApp()
+const api = require('../../service/autosig-apis')
+const wlanProbe = require('../../service/wlan-probe')
+
 // pages/begin/begin.js
 Page({
 
@@ -22,7 +25,7 @@ Page({
     lenTasks: 0,
     tasks: null,
     loading: [true],
-    taskTotal: '--',
+    taskTodo: '--',
     taskFinished: '--',
     taskRatio: '---',
     iconList: [{
@@ -66,10 +69,6 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    wx.showLoading({
-      title: '加载中',
-    })
-
     if (app.globalData.userInfo) {
       this.setData({
         userInfo: app.globalData.userInfo,
@@ -86,15 +85,11 @@ Page({
               hasUserInfo: true
             })
           } else {
-            this.setData({
-              authRequired: true
-            })
+            this.setData({ authRequired: true })
           }
         }
       } else {
-        this.setData({
-          authRequired: true
-        })
+        this.setData({ authRequired: true })
       }
     } else {
       // 在没有 open-type=getUserInfo 版本的兼容处理
@@ -166,14 +161,12 @@ Page({
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh: function () {
-
   },
 
   /**
    * 页面上拉触底事件的处理函数
    */
   onReachBottom: function () {
-
   },
 
   /**
@@ -188,10 +181,9 @@ Page({
    * 在此处异步获取主页面所需的数据。
    */
   loginStateChanged: function () {
-    wx.hideLoading()
     switch (this.data.loginState) {
       case 2: // 要求绑定
-        this.setData({ taskTotal: '1' })
+        this.setData({ taskTodo: '1' })
         break;
       case 1: // 成功登陆
         this.setData({ canOperate: true })
@@ -207,8 +199,7 @@ Page({
   fetchData() {
     if (!this.data.canOperate)
       return
-    this.setData({ taskTotal: '--' })
-    var api = require('../../service/autosig-apis')
+    this.setData({ taskTodo: '--' })
     var _this = this
     // 获取今日任务
     this.setData({ 'loading[0]': true })
@@ -217,10 +208,25 @@ Page({
       function (status, data) {
         _this.setData({ 'loading[0]': false })
         if (status.code == 0) {
+          // 对活动时间排序
+          for (var i=0; i < data.size; i++) {
+            for(var j =i+1; j < data.size; j++) {
+              var H = data.tasks[i].activity.startHour;
+              var M = data.tasks[i].activity.startMinute;
+              var mH = data.tasks[j].activity.startHour;
+              var mM = data.tasks[j].activity.startMinute;
+              if (app.globalData.util.compareTime([H,M], [mH,mM]) > 0) {
+                var tmp = data.tasks[i]
+                data.tasks[i] = data.tasks[j]
+                data.tasks[j] = tmp
+              }
+            }
+          }
           _this.setData({
-            attendedGroup: (data.num_attended_groups > 0),
+            attendedGroup: (data.num_attended_groups > 0 || data.num_created_groups > 0),
             lenTasks: data.size,
-            tasks: data.tasks
+            tasks: data.tasks,
+            taskTodo: data.num_todo
           })
         } else {
           api.showError(status)
@@ -230,26 +236,54 @@ Page({
   },
 
   onMainScroll(e) {
-    this.setData({ showCustomBarBg: e.detail.scrollTop > 20 })
+    this.setData({ showCustomBarBg: e.detail.scrollTop > 10 })
   },
+
+  /**
+   * 单击 重新获取头像按钮
+   */
+  onRegetUserInfo(e) {
+    if (e.detail.userInfo) {
+      app.globalData.authRequired = false
+      app.globalData.userInfo = e.detail.userInfo
+      this.setData({
+        userInfo: app.globalData.userInfo,
+        authRequired: false,
+        hasUserInfo: true,
+        showUserInfo: true
+      })
+    }
+  },
+
+  /**
+   * 单击 去完善 按钮
+   */
   onGotoRegister(e) {
-    wx.showLoading({
-      title: '加载中',
-    })
     app.globalData.userInfo = e.detail.userInfo
     this.setData({
       userInfo: app.globalData.userInfo,
       hasUserInfo: true,
       showUserInfo: true
     })
-    wx.navigateTo({
-      url: '/pages/logs/logs',
-    })
-    wx.hideLoading()
+    app.globalData.util.gotoPage('/pages/logs/logs')
+  },
+  /**
+   * Helper函数 - 在登陆未完成时，不能跳转到其它页面
+   */
+  switchPage(callback) {
+    if (this.data.canOperate) {
+      callback()
+    } else {
+      wx.showModal({
+        title: '尚未登陆',
+        content: '请等待登陆完成',
+        showCancel: false,
+      })
+    }
   },
   gotogroups() {
-    wx.navigateTo({
-      url: '/pages/groups/groups',
+    this.switchPage(function() {
+        app.globalData.util.gotoPage('/pages/groups/groups')
     })
   },
   onAddGroup() {
@@ -276,6 +310,11 @@ Page({
       case 0:
         this.gotogroups()
         break;
+      case 1:
+        this.switchPage(function () {
+          app.globalData.util.gotoPage('/pages/broadcast/broadcast')
+        })
+        break;
     }
   },
 
@@ -285,24 +324,83 @@ Page({
   onSetSign(e) {
     var task = e.currentTarget.dataset.task
     var sign = !task.activity.signStarted;
-
-    wx.showLoading({
-      title: sign?'发起中':'结束中',
-    })
-    this.setData({ lenSearchResults: 0 })
-    var api = require('../../service/autosig-apis')
     var _this = this
-    api.setSign(
-      task.activity.uid,
-      sign,
-      app.globalData.token,
-      function (status, data) {
-        wx.hideLoading()
-        if (status.code == 0) {
-          _this.fetchData()
-        } else {
-          api.showError(status)
+
+    wx.showModal({
+      title: sign?'发起签到':'结束签到',
+      content: '确定' + (sign?'发起':'结束') + '“' + task.activity.name + '”的签到？' + (sign?'':'一旦结束无法撤销！'),
+      success(res) {
+        if (res.confirm) {
+          wx.showLoading({
+            title: sign ? '发起中' : '结束中',
+          })
+          _this.setData({ lenSearchResults: 0 })
+          api.setSign(
+            task.activity.uid,
+            sign,
+            app.globalData.token,
+            function (status, data) {
+              wx.hideLoading()
+              if (status.code == 0) {
+                _this.fetchData()
+              } else {
+                api.showError(status)
+              }
+            }
+          )
         }
+      }
+    })
+  },
+
+  /**
+   * 单击 签到按钮
+   */
+  onSignin(e) {
+    var task = e.currentTarget.dataset.task
+    var activity = task.activity
+    var wlanMACs = []
+    var _this = this
+    wx.showLoading({
+      title: '扫描中',
+    })
+    wlanProbe.probeWLAN(
+      /* success */
+      function(list) {
+        wx.hideLoading()
+        console.info(list)
+        var i=list.length
+        while(i--) {
+          wlanMACs.push(list[i].BSSID)
+        }
+        if (wlanMACs.length) {
+          api.signin(
+            activity.uid,
+            app.globalData.token,
+            wlanMACs,
+            function (status, data) {
+              if (status.code == 0) {
+                wx.showToast({
+                  title: '签到成功',
+                })
+                _this.fetchData()
+              } else {
+                api.showError(status)
+              }
+            }
+          )
+        } else {
+          api.showError('E_SIGN_POINT_NF')
+        }
+      },
+      /* fail */
+      function (e) {
+        wx.hideLoading()
+        wx.showModal({
+          title: '提示',
+          content: '请先打开WLAN开关',
+          showCancel: false
+        })
       }
     )
   }

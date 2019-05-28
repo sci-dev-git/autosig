@@ -72,6 +72,10 @@
   color: black;
 }
 
+.cu-timeline>.cu-item::before {
+	background-color: rgba(0, 0, 0, 0);
+}
+
 .goto-group {
   position: relative;
   top: -100rpx;

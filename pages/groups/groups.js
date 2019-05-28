@@ -1,11 +1,13 @@
 const app = getApp()
+const api = require('../../service/autosig-apis')
+
 Page({
   data: {
     tabCur: 0,
     showSearchResults: false,
     groupName: '测试群组 2',
     groupDesc: 'TFEEWLIGNJERKGJKBFEWBFWLGVNWWL WENFWLJGKWKVL WKNF KGWG W GWGW EWJKFGRGGNWGWB BER,BGL',
-    loading: [true, true, true, true, true], // nearby, attended, created, search, mac
+    loading: [false, false, false, false, false], // nearby, attended, created, search, mac
     nearbyGroups: null,
     lenNearbyGroups: 0,
     attendedGroups: null,
@@ -28,7 +30,6 @@ Page({
    * Helper函数 - 从服务器拉取数据
    */
   fetchData() {
-    var api = require('../../service/autosig-apis')
     var _this = this
     // 获取附近的群组
     this.setData({'loading[0]': true})
@@ -104,7 +105,6 @@ Page({
     wx.showLoading({
       title: '请稍后',
     })
-    var api = require('../../service/autosig-apis')
     var _this = this
     api.attendGroup(
       uid,
@@ -113,12 +113,20 @@ Page({
         wx.hideLoading()
         if (status.code == 0) {
           _this.fetchData()
+          app.globalData.index_fetchData()
         } else {
           api.showError(status)
         }
       }
     )
     app.globalData.index_fetchData()
+  },
+  /**
+   * 页面相关事件处理函数--监听用户下拉动作
+   */
+  onPullDownRefresh: function () {
+    this.fetchData()
+    wx.stopPullDownRefresh()
   },
   /**
    * 切换 标签栏
@@ -146,7 +154,6 @@ Page({
     wx.showLoading({
       title: '请稍后',
     })
-    var api = require('../../service/autosig-apis')
     var _this = this
     api.createGroup(
       app.globalData.token,
@@ -189,7 +196,6 @@ Page({
       title: '加载中',
     })
     this.setData({ lenSearchResults: 0 })
-    var api = require('../../service/autosig-apis')
     var _this = this
     this.setData({'loading[3]': true})
     api.searchGroups(
@@ -224,7 +230,6 @@ Page({
       this.setData({ lenSearchResults: 0 })
       return
     }
-    var api = require('../../service/autosig-apis')
     var _this = this
     var targetKeyword = _this.data.searchContent
     this.setData({'loading[3]': true})
@@ -270,9 +275,7 @@ Page({
     app.globalData.groupedit_currentGroup = group
     app.globalData.groupedit_manageGroup = manage
     app.globalData.groupedit_fetchData = this.fetchData
-    wx.navigateTo({
-      url: './groupedit/groupedit',
-    })
+    app.globalData.util.gotoPage('./groupedit/groupedit')
   },
   /**
    * 在“加入的群组”列表中单击
@@ -333,7 +336,6 @@ Page({
       title: '加载中',
     })
     this.setData({ lenSearchResults: 0 })
-    var api = require('../../service/autosig-apis')
     var _this = this
     api.updateWlanMAC(
       _this.data.wlanMac,

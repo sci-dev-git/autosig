@@ -15,5 +15,35 @@ const formatNumber = n => {
 }
 
 module.exports = {
-  formatTime: formatTime
+  formatTime: formatTime,
+
+  /**
+   * 比较时间大小
+   * @param src 二维数组 [hour, minute]
+   * @param dst 二维数组 [hour, minute]
+   */
+  compareTime: function(src, dst) {
+    for(var i=0; i < 2; i++) {
+      var diff = src[i] - dst[i]
+      if (diff)
+        return diff
+    }
+    return 0;
+  },
+
+  gotoPage: function (path, hideLoading) {
+    if (hideLoading && hideLoading == true) {
+      wx.navigateTo({ url: path })
+    } else {
+      wx.showLoading({
+        title: '请稍后',
+      })
+      wx.navigateTo({
+        url: path,
+        complete: function () {
+          wx.hideLoading()
+        }
+      })
+    }
+  }
 }

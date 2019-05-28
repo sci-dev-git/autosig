@@ -18,8 +18,8 @@
 
 const app = getApp()
 
-const apiHost = "https://autosigs.applinzi.com";
-//const apiHost = "http://localhost:5050"; // for debug
+//const apiHost = "https://autosigs.applinzi.com";
+const apiHost = "http://localhost:5050"; // for debug
 
 function requestAPI(url, callback, opaque) {
   wx.request({
@@ -349,7 +349,7 @@ module.exports.getWlanMAC = function (token, callback) {
 }
 
 /**
- * 获取任务列表
+ * 获取任务列表接口
  * @param token 用于内部认证的唯一凭证
  */
 module.exports.getTasks = function (token, callback) {
@@ -361,7 +361,7 @@ module.exports.getTasks = function (token, callback) {
 }
 
 /**
- * 设置签到
+ * 设置签到接口
  * @param uid 目标活动的uid
  * @param start true开始签到，false停止签到
  */
@@ -371,6 +371,32 @@ module.exports.setSign = function (uid, start, token, callback) {
     return
   }
   requestAPI(`${apiHost}/activity/set_sign?uid=${uid}&start=${start}&token=${token}`, callback)
+}
+
+/**
+ * 签到接口
+ * @param uid 目标活动的uid
+ * @param token 用于内部认证的唯一凭证
+ * @param wlan_macs 探测到的WLAN MAC地址列表
+ */
+module.exports.signin = function (uid, token, wlan_macs, callback) {
+  if (uid == null || token == null || wlan_macs == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/activity/signin?uid=${uid}&wlan_macs=${wlan_macs}&token=${token}`, callback)
+}
+
+/**
+ * 获取公告接口
+ * @param token 用于内部认证的唯一凭证
+ */
+module.exports.getMsgs = function (token, callback) {
+  if (token == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/usr/msgs?token=${token}`, callback)
 }
 
 var errDisplayed = false; // 对于多个异步请求同时抛出错误的情况，只反馈最早的错误
@@ -414,6 +440,14 @@ module.exports.showError = function(status) {
         err = '连接失败'; break;
       case 'E_INVALID_PARAMETER':
         err = '网络传输错误'; break;
+      case 'E_SIGN_IS_ENDED':
+        err = '签到已经结束'; break;
+      case 'E_SIGN_UNSTARTED':
+        err = '签到未开始'; break;
+      case 'E_SIGN_POINT_NF':
+        err = '离签到点过远'; break;
+      case 'E_WLAN_UNCONFIG':
+        err = '管理员未设置签到点，请联系管理员处理'; break;
       default:
         err = '操作失败'; break;
     }
