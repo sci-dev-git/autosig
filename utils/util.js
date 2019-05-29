@@ -18,6 +18,22 @@ module.exports = {
   formatTime: formatTime,
 
   /**
+ * 将Unix格式的时间戳转换为ascii码
+ */
+  timestamp2asc: function (timestamp) {
+    var now = new Date();
+    now.setTime(timestamp)
+    var y = now.getFullYear()
+  　var m = now.getMonth() + 1
+    var d = now.getDate()
+    var h = now.getHours()
+    var min = now.getMinutes()
+    var s = now.getSeconds()
+    return y + "-" + (m < 10 ? "0" + m : m) + "-" + (d < 10 ? "0" + d : d) + ' ' +
+      (h < 10 ? "0" + h : h) + ':' + (min < 10 ? "0" + min : min) + ':' + (s < 10 ? "0" + s : s);
+  },
+
+  /**
    * 比较时间大小
    * @param src 二维数组 [hour, minute]
    * @param dst 二维数组 [hour, minute]

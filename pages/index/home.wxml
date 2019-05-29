@@ -80,7 +80,7 @@
             <block wx:for="{{tasks}}" wx:key>
               <view class="cu-time">{{sdisp.timestr(tasks[index].activity.startHour, tasks[index].activity.startMinute)}}</view>
                 <view class="cu-item">
-                  <view class="bg-cyan radius shadow-blur content">
+                  <view class="{{tasks[index].bgcolor}} radius shadow-blur content">
                     <view class="cu-capsule">
                       <view class="cu-tag bg-gray">{{tasks[index].group.name}}</view>
                       <view class="cu-tag line-white">{{tasks[index].activity.name}}</view>
@@ -92,10 +92,23 @@
                     <view class='right-align'>
                       <view>
                         <block wx:if="{{tasks[index].managed}}">
-                          <button class="cu-btn bg-red.light radius shadow tl-button-sign" data-task="{{tasks[index]}}" bindtap='onSetSign'>{{tasks[index].activity.signStarted?'结束签到':'发起签到'}}</button>
+                          <block wx:if="{{!tasks[index].sign_ended}}">
+                            <button class="cu-btn bg-red.light radius shadow tl-button-sign" data-task="{{tasks[index]}}" bindtap='onSetSign'>{{tasks[index].activity.signStarted?'结束签到':'发起签到'}}</button>
+                          </block>
+                          <block wx:if="{{tasks[index].sign_ended}}">
+                            <button class="cu-btn bg-red.light radius shadow tl-button-sign" data-task="{{tasks[index]}}" bindtap='onQuerySignState'>{{tasks[index].num_absent ? '未签到：（' + tasks[index].num_absent + '）人' : '全勤'}}</button>
+                          </block>
                         </block>
                         <block wx:else>
-                          <button wx:if="{{tasks[index].activity.signStarted && !tasks[index].signed}}" class="bg-cyan.light cuIcon-post radius shadow tl-button-sign" data-task="{{tasks[index]}}" bindtap='onSignin'>签到</button>
+                          <block wx:if="{{!tasks[index].sign_ended}}">
+                            <button wx:if="{{tasks[index].activity.signStarted && !tasks[index].signed}}" class="bg-cyan.light cuIcon-post radius shadow tl-button-sign" data-task="{{tasks[index]}}" bindtap='onSignin'>签到</button>
+                          </block>
+                          <block wx:if="{{tasks[index].signed}}">
+                            已签到
+                          </block>
+                          <block wx:if="{{tasks[index].sign_ended && tasks[index].sign_missed}}">
+                            错过签到！
+                          </block>
                         </block>
                       </view>
                     </view>
@@ -152,3 +165,73 @@
 
   </view>
  </scroll-view>
+ 
+<!-- modal窗口: 添加活动 -->
+<view class="cu-modal {{showSignState?'show':''}}">
+  <view class="cu-dialog">
+    <view class="cu-bar bg-white justify-end">
+      <view class="content">签到记录</view>
+      <view class="action" bindtap="onHideSignState">
+        <text class="cuIcon-close text-red"></text>
+      </view>
+    </view>
+
+    <!-- FIXME wx:if : seems a bug of wx native widget -->
+    <block wx:if='{{showCreateActivity}}'>
+      <scroll-view scroll-y bindscroll='onModalScroll' class='create-act-size'>
+        <view class="padding">
+          <form>
+            <view class="cu-form-group">
+              <view class="title">名称</view>
+              <input disabled='{{!showCreateActivity}}' value="{{activityName}}" placeholder="输入活动名称" bindinput="bindActivityNameInput"></input>
+              <text class="cuIcon-edit"></text>
+            </view>
+            <view class="cu-form-group">
+              <view class="title">星期{{sdisp.getDayStr(daySelectorCur)}} / 周数</view>
+              <picker mode="time" value="{{activityTime}}" start="05:00" end="23:00" bindchange="onActivityTimeChange">
+                <view class="picker">
+                  {{activityTime}}
+                </view>
+              </picker>
+            </view>
+            <view class="cu-form-group">
+              <scroll-view scroll-x class="bg-white nav text-center">
+                <view class="cu-item {{0==weekModeCur?'bg-cyan.light cur':''}}" bindtap="onSwitchWeekMode" data-mode="{{0}}">全部</view>
+                <view class="cu-item {{1==weekModeCur?'bg-cyan.light cur':''}}" bindtap="onSwitchWeekMode" data-mode="{{1}}">单周</view>
+                <view class="cu-item {{2==weekModeCur?'bg-cyan.light cur':''}}" bindtap="onSwitchWeekMode" data-mode="{{2}}">双周</view>
+              </scroll-view>
+            </view>
+            <view class="cu-form-group">
+              <view class='cu-list grid col-5 no-border'>
+                <block wx:for="{{25}}" wx:for-index="week" wx:key>
+                  <text class="tb-block {{weekSelected[week] ? 'bg-cyan' : 'bg-white'}}" bindtap='onWeekTap' data-cur='{{week}}'>{{week+1}}</text>
+                </block>
+              </view>
+            </view>
+            <view class="cu-form-group">
+              <view class="title">地点</view>
+              <input maxlength="100" disabled='{{!showCreateActivity}}' bindinput="bindActivityWhereInput"  value="{{activityWhere}}" placeholder="输入活动地点"></input>
+            </view>
+            <view class="cu-form-group">
+              <view class="title">主讲</view>
+              <input  maxlength="100" disabled='{{!showCreateActivity}}' bindinput="bindActivityHostInput"  value="{{activityHost}}" placeholder="输入活动主讲"></input>
+            </view>
+            <view class="cu-form-group align-start">
+              <view class="title">简介</view>
+              <!-- FIXME disabled : seems a bug of wx native widget -->
+              <textarea maxlength="100" disabled='{{!showCreateActivity}}'  bindinput="bindActivityDescInput"  value="{{activityDesc}}" placeholder="输入活动描述（100字以内）"></textarea>
+            </view>
+            <view class="cu-form-group right-align align-center">
+              <template is='place-capsule'/>
+            </view>
+            <view class="padding">
+              <button class="cu-btn block bg-blue.light margin-tb-sm lg" bindtap='onUpdateGroup'>{{acitivityEditMode?'修改':'创建'}}</button>
+            </view>
+          </form>
+        </view>
+      </scroll-view>
+      <text class='cuIcon-refresharrow text-gray margin'> 向下拖动</text>
+    </block>
+
+  </view>
+</view>

@@ -2,10 +2,11 @@
   "pages": [
     "pages/index/home",
     "pages/groups/groups",
-    "pages/navigator/home/home",
     "pages/logs/logs",
     "pages/groups/groupedit/groupedit",
-    "pages/broadcast/broadcast"
+    "pages/broadcast/broadcast",
+    "pages/memo/memo",
+    "pages/navigator/navigator"
   ],
   "window": {
     "backgroundTextStyle": "light",

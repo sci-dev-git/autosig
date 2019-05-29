@@ -1,0 +1,7 @@
+<cu-custom bgColor="bg-gradual-blue" isBack='true'>
+  <view slot="content">备忘</view>
+  <view slot="backText">返回</view>
+  <view class="action" slot="right">
+    <view class="cu-load load-icon {{loading[0] || loading[1] ?'loading':'over'}}"></view>
+  </view>
+</cu-custom>

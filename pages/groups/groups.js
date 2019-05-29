@@ -23,7 +23,7 @@ Page({
     wlanMac: '',
     wlanMacOrigin: ''
   },
-  onLoad: function (opt) {
+  onShow: function (opt) {
     this.fetchData()
   },
   /**
@@ -113,13 +113,11 @@ Page({
         wx.hideLoading()
         if (status.code == 0) {
           _this.fetchData()
-          app.globalData.index_fetchData()
         } else {
           api.showError(status)
         }
       }
     )
-    app.globalData.index_fetchData()
   },
   /**
    * 页面相关事件处理函数--监听用户下拉动作
@@ -274,7 +272,6 @@ Page({
   showGroupEdit(group, manage) {
     app.globalData.groupedit_currentGroup = group
     app.globalData.groupedit_manageGroup = manage
-    app.globalData.groupedit_fetchData = this.fetchData
     app.globalData.util.gotoPage('./groupedit/groupedit')
   },
   /**

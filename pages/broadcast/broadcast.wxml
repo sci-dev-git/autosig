@@ -1,3 +1,4 @@
+<wxs src="../../string-display.wxs" module="sdisp" />
 <cu-custom bgColor="bg-gradual-blue" isBack='true'>
   <view slot="content">公告</view>
   <view slot="backText">返回</view>
@@ -6,7 +7,48 @@
   </view>
 </cu-custom>
 
-<view class='box'>
+<!--
+ 统一公告列表模板
+ @param source 公告列表的数据源
+ @param source_len 数据长度
+ -->
+<template name="broadcastCard">
+  <block wx:for="{{source}}" wx:key>
+    <view class="cu-card article">
+      <view class="cu-item shadow">
+        <view class="title">
+          <view class="text-cut">{{(!source[index].managed && !source[index].read)?'【未读】':''}}{{source[index].msg.title}}</view>
+        </view>
+        <view class="content">
+          <view class="desc">
+            <view class="margin-top-sm">{{source[index].msg.content}}</view>
+            <view class="margin-top-sm">浏览：{{source[index].num_read}}次</view>
+            <view class='margin-top-sm'>
+              <view class="cu-tag bg-red light sm round">{{source[index].groupName}}</view>
+              <view class="cu-tag bg-green light sm round">{{source[index].msg.tags}}</view>
+              <view class="cu-tag round">发布时间：{{source[index].datestr}}</view>
+            </view>
+            <view wx:if="{{source[index].managed}}" class='margin-top'>
+              <view/>
+              <button class="cu-btn cuIcon-delete lines-red" data-cur="{{source[index]}}" bindtap='onRemoveBroadcast'> 删除</button>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+  <block wx:if="{{!loading[0] && !source_len}}">
+    <view class="cu-card article {{isCard?'no-card':''}}">
+      <view class="cu-item shadow">
+        <view class="title">
+          <view class="text-cut">暂无公告</view>
+        </view>
+      </view>
+    </view>
+  </block>
+</template>
+
+<view class='box' id='broadcast_box'>
   <scroll-view scroll-x class="bg-white nav">
     <view class="flex text-center">
       <view class="cu-item flex-sub {{0==tabCur?'text-blue cur':''}}" bindtap="onTabSwitch" data-id='{{0}}'>查看公告</view>
@@ -19,32 +61,16 @@
     -->
   <block wx:if="{{0==tabCur}}">
 
-    <block wx:for="{{broadcasts}}" wx:key>
-      <view class="cu-card article {{isCard?'no-card':''}}">
-        <view class="cu-item shadow">
-          <view class="title">
-            <view class="text-cut">{{broadcasts[index].msg.title}}</view>
-          </view>
-          <view class="content">
-            <view class="desc">
-              <view class="text-content">{{broadcasts[index].msg.content}}</view>
-              <view>
-                <view class="cu-tag bg-red light sm round">{{broadcasts[index].groupName}}</view>
-                <view class="cu-tag bg-green light sm round">{{broadcasts[index].msg.tags}}</view>
-              </view>
-            </view>
-          </view>
+    <template is="broadcastCard" data="{{source: broadcasts, source_len: lenBroadcasts}}"/>
+
+    <block wx:if="{{lenPostedBroadcasts}}">
+      <view class="cu-bar bg-white margin-top">
+        <view class="action border-title">
+          <text class="text-bold text-blue">我发布的公告</text>
+          <text class="bg-gradual-blue" style="width:3rem"></text>
         </view>
       </view>
-    </block>
-    <block wx:if="{{!loading[0] && !lenBroadcasts}}">
-      <view class="cu-card article {{isCard?'no-card':''}}">
-        <view class="cu-item shadow">
-          <view class="title">
-            <view class="text-cut">暂无公告</view>
-          </view>
-        </view>
-      </view>
+      <template is="broadcastCard" data="{{source: postedBroadcasts, source_len: lenPostedBroadcasts}}"/>
     </block>
 
   </block>
@@ -56,52 +82,62 @@
 
     <view class="cu-bar bg-white margin-top">
       <view class="action border-title">
-        <text class="text-bold text-blue">编辑公告</text>
+        <text class="text-bold text-blue">1、编辑公告</text>
         <text class="bg-gradual-blue" style="width:3rem"></text>
       </view>
     </view>
     <form>
       <view class="cu-form-group">
-        <view class="title">名称</view>
-        <input placeholder="输入群组名称" bindinput="bindGroupNameInput"></input>
+        <view class="title">标题"></view>
+        <input placeholder="输入标题" bindinput="bindMsgTitleInput"></input>
         <text class="cuIcon-info"></text>
       </view>
       <view class="cu-form-group align-start">
-        <view class="title">简介</view>
-        <textarea maxlength="100" bindinput="textareaBInput" placeholder="输入群组描述（100字以内）" bindinput="bindGroupDescInput"></textarea>
+        <view class="title">内容</view>
+        <textarea maxlength="500" placeholder="输入公告内容（500字以内）" bindinput="bindMsgContentInput"></textarea>
       </view>
       <view class="cu-bar bg-white margin-top">
         <view class="action border-title">
-          <text class="text-bold text-blue">选择群组：</text>
+          <text class="text-bold text-blue">2、选择群组：</text>
           <text class="bg-gradual-blue" style="width:3rem"></text>
         </view>
       </view>
-      <view class="cu-form-group">
-        <block wx:if="{{lenCreatedGroups>0}}">
-          <view class="cu-list menu-avatar no-padding">
-            <block wx:for="{{createdGroups}}" wx:key>
-              <view class="cu-item" bindtap='onOpenCreatedGroupEdit' data-cur='{{createdGroups[index]}}'>
-                <view class="cu-avatar round lg bg-blue">G</view>
-                <view class="content">
-                  <view class="text-grey">
-                    <text class="text-abc">{{createdGroups[index].name}}</text>
-                  </view>
-                  <view class="text-gray text-sm">
-                    {{sdisp.cutstr2((createdGroups[index].desc.length ? sdisp.cutstr(createdGroups[index].desc) + ' ' : '') + createdGroups[index].place)}}
-                  </view>
-                </view>
-                <view class='cuIcon-right margin-right'></view>
+
+      <block wx:if="{{lenCreatedGroups>0}}">
+      <view class="cu-list menu-avatar no-padding">
+        <block wx:for="{{createdGroups}}" wx:key>
+          <view class="cu-item" bindtap='onSelectGroup' data-idx='{{index}}'>
+            <!-- <view class="cu-avatar round sm {{groupSelected[index]?'bg-blue':''}}"></view> -->
+            <view class="cu-avatar cuIcon-roundcheck lg {{groupSelected[index]?'bg-blue':''}}"></view>
+            <view class="content">
+              <view class="text-grey">
+                <text class="text-abc">{{createdGroups[index].name}}</text>
               </view>
-            </block>
+              <view class="text-gray text-sm">
+                {{sdisp.cutstr2((createdGroups[index].desc.length ? sdisp.cutstr(createdGroups[index].desc) + ' ' : '') + createdGroups[index].place)}}
+              </view>
+            </view>
           </view>
         </block>
       </view>
-      
-      <view class="cu-form-group">
-        <button class="cu-btn round lines-cyan shadow"role="button"aria-label=""aria-disabled="false" bindtap='onCreateGroup'>创建群组</button>
-      </view>
+
+    </block>
+
     </form>
 
+    <block wx:if="{{canPostMessage}}">
+      <view class="cu-bar bg-white margin-top">
+        <view class="action border-title">
+          <text class="text-bold text-blue">3、发布</text>
+          <text class="bg-gradual-blue" style="width:3rem"></text>
+        </view>
+      </view>
+      <form>
+        <view class="cu-form-group">
+          <button class="cu-btn round lines-cyan shadow"role="button"aria-label=""aria-disabled="false" bindtap='onPostMessage'>发布新公告</button>
+        </view>
+      </form>
+    </block>
     
   </block>
 

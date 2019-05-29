@@ -34,9 +34,9 @@ Page({
   },
 
   /**
-   * 生命周期函数--监听页面加载
+   * 生命周期函数--监听页面显示
    */
-  onLoad: function (options) {
+  onShow: function (options) {
     this.switchWeekMode(0)
     this.fetchData()
   },
@@ -169,8 +169,6 @@ Page({
       function (status, data) {
         wx.hideLoading()
         if (status.code == 0) {
-          app.globalData.groupedit_fetchData()
-          app.globalData.index_fetchData()
           wx.showToast({
             title: '退出成功',
             showCancel: false
@@ -197,8 +195,6 @@ Page({
       function (status, data) {
         wx.hideLoading()
         if (status.code == 0) {
-          app.globalData.groupedit_fetchData()
-          app.globalData.index_fetchData()
           _this.fetchData()
           wx.showToast({
             title: '删除成功',
@@ -209,7 +205,6 @@ Page({
         }
       }
     )
-    app.globalData.index_fetchData()
   },
   /**
    * Helper函数 - 删除群组
@@ -225,8 +220,6 @@ Page({
       function (status, data) {
         wx.hideLoading()
         if (status.code == 0) {
-          app.globalData.groupedit_fetchData()
-          app.globalData.index_fetchData()
           wx.showToast({
             title: '删除成功',
             showCancel: false
@@ -254,8 +247,6 @@ Page({
         wx.hideLoading()
         if (status.code == 0) {
           _this.fetchData()
-          app.globalData.groupedit_fetchData()
-          app.globalData.index_fetchData()
           wx.showToast({
             title: '删除成功',
             showCancel: false
@@ -438,8 +429,6 @@ Page({
               'currentGroup.name': _this.data.groupName,
               'currentGroup.desc': _this.data.groupDesc
             })
-            app.globalData.groupedit_fetchData()
-            app.globalData.index_fetchData()
             wx.showToast({
               title: '修改成功',
               showCancel: false
@@ -588,8 +577,6 @@ Page({
         _this.onHideCreateActivity()
         if (status.code == 0) {
           _this.fetchData()
-          app.globalData.groupedit_fetchData()
-          app.globalData.index_fetchData()
         } else {
           api.showError(status)
         }

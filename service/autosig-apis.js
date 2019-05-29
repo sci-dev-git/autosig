@@ -396,7 +396,58 @@ module.exports.getMsgs = function (token, callback) {
     throwParamCheckError(callback)
     return
   }
-  requestAPI(`${apiHost}/usr/msgs?token=${token}`, callback)
+  requestAPI(`${apiHost}/broadcast/msgs?token=${token}`, callback)
+}
+
+/**
+ * 发布公告接口
+ * @param token 用于内部认证的唯一凭证
+ */
+module.exports.postMsg = function (uids, title, content, tags, token, callback) {
+  if (uids == null || uids.length == 0 || token == null || title == null || content == null || tags == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/broadcast/post?uids=${uids}&title=${title}&content=${content}&tags=${tags}&token=${token}`, callback)
+}
+
+/**
+ * 删除公告接口
+ * @param uid 群组UID
+ * @param msg_uid 目标消息的uid.
+ * @param token 用于内部认证的唯一凭证
+ */
+module.exports.removeMsg = function (uid, msg_uid, token, callback) {
+  if (uid == null || msg_uid == null || token == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/broadcast/remove?uid=${uid}&msg_uid=${msg_uid}&token=${token}`, callback)
+}
+
+/**
+ * 获取未读公告数量的接口
+ * @param token 用于内部认证的唯一凭证
+ */
+module.exports.getUnreadCount = function (token, callback) {
+  if (token == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/broadcast/unread?&token=${token}`, callback)
+}
+
+/**
+ * 标识公告已读的接口
+ * @param uids 目标公告的列表
+ * @param token 用于内部认证的唯一凭证
+ */
+module.exports.msgMarkRead = function (uids, token, callback) {
+  if (uids == null || token == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/usr/unread_msgs?&token=${token}`, callback)
 }
 
 var errDisplayed = false; // 对于多个异步请求同时抛出错误的情况，只反馈最早的错误
@@ -448,6 +499,8 @@ module.exports.showError = function(status) {
         err = '离签到点过远'; break;
       case 'E_WLAN_UNCONFIG':
         err = '管理员未设置签到点，请联系管理员处理'; break;
+      case 'E_BROADCAST_NOT_FOND':
+        err = '公告未找到'; break;
       default:
         err = '操作失败'; break;
     }

@@ -1,0 +1,11 @@
+<cu-custom bgColor="bg-gradual-blue" isBack='true'>
+  <view slot="content">导航</view>
+  <view slot="backText">返回</view>
+  <view class="action" slot="right">
+    <view class="cu-load load-icon {{loading[0] || loading[1] ?'loading':'over'}}"></view>
+  </view>
+</cu-custom>
+
+<view class='box'>
+  <map class='navi-map' show-compass='true' enable-zoom='true' bindupdated='onMapUpdated'/>
+</view> <!-- box -->

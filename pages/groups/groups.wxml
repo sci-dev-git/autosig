@@ -155,7 +155,7 @@
       </view>
       <view class="cu-form-group align-start">
         <view class="title">简介</view>
-        <textarea maxlength="100" bindinput="textareaBInput" placeholder="输入群组描述（100字以内）" bindinput="bindGroupDescInput"></textarea>
+        <textarea maxlength="100" placeholder="输入群组描述（100字以内）" bindinput="bindGroupDescInput"></textarea>
       </view>
       <view class="cu-form-group">
         <button class="cu-btn round lines-cyan shadow"role="button"aria-label=""aria-disabled="false" bindtap='onCreateGroup'>创建群组</button>

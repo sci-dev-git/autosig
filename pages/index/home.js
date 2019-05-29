@@ -24,7 +24,7 @@ Page({
     attendedGroup: false,
     lenTasks: 0,
     tasks: null,
-    loading: [true],
+    loading: [true, true], // tasks, unread msgs
     taskTodo: '--',
     taskFinished: '--',
     taskRatio: '---',
@@ -63,7 +63,8 @@ Page({
       color: 'purple',
       badge: 0,
       name: '帮助'
-    }]
+    }],
+    showSignState: false
   },
   /**
    * 生命周期函数--监听页面加载
@@ -140,7 +141,7 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-
+    this.fetchData()
   },
 
   /**
@@ -187,7 +188,6 @@ Page({
         break;
       case 1: // 成功登陆
         this.setData({ canOperate: true })
-        app.globalData.index_fetchData = this.fetchData
         this.fetchData()
         break;
     }
@@ -222,6 +222,8 @@ Page({
               }
             }
           }
+          // 为时间轴配色
+          _this.planTimelineColors(data.tasks)
           _this.setData({
             attendedGroup: (data.num_attended_groups > 0 || data.num_created_groups > 0),
             lenTasks: data.size,
@@ -233,6 +235,40 @@ Page({
         }
       }
     )
+    // 获取未读公告信息
+    this.setData({ 'loading[1]': true })
+    api.getUnreadCount(
+      app.globalData.token,
+      function (status, data) {
+        _this.setData({ 'loading[1]': false })
+        if (status.code == 0) {
+          _this.setData({
+            'iconList[1].badge': data.count
+          })
+        } else {
+          api.showError(status)
+        }
+      }
+    )
+  },
+
+  /**
+   * Helper函数 - 为时间轴卡片配色
+   * @param tasks 列表引用
+   */
+  planTimelineColors(tasks) {
+    var colors = ['bg-blue', 'bg-purple', 'bg-mauve', 'bg-pink', 'bg-red', 'bg-orange', 'bg-yellow', 'bg-olive', 'bg-green']
+    var colorIdx = 0
+    for (var i = 0; i < tasks.length; i++) {
+      var task = tasks[i]
+      if ( (task.managed && task.todo) ||
+           (!task.managed && !task.signed) ) {
+        task.bgcolor = 'bg-cyan'
+      } else {
+        task.bgcolor = colors[colorIdx % (colors.length - 1)]
+        ++colorIdx
+      }
+    }
   },
 
   onMainScroll(e) {
@@ -313,6 +349,16 @@ Page({
       case 1:
         this.switchPage(function () {
           app.globalData.util.gotoPage('/pages/broadcast/broadcast')
+        })
+        break;
+      case 2:
+        this.switchPage(function () {
+          app.globalData.util.gotoPage('/pages/navigator/navigator')
+        })
+        break;
+      case 3:
+        this.switchPage(function () {
+          app.globalData.util.gotoPage('/pages/memo/memo')
         })
         break;
     }
@@ -403,5 +449,19 @@ Page({
         })
       }
     )
+  },
+
+  /**
+   * 单击 查看签到
+   */
+  onQuerySignState() {
+
+  },
+
+  /**
+   * 隐藏 签到状态
+   */
+  onHideSignState() {
+    this.setData({ showSignState: false })
   }
 })
