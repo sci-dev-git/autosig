@@ -85,7 +85,6 @@ Page({
             sectionThresh: Math.floor(maxSections / 2)-1,
             wlist: wlist
           })
-          console.log(_this.data.sectionThresh)
         } else {
           api.showError(status)
         }

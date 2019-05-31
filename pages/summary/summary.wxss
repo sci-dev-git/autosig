@@ -13,12 +13,6 @@
   border-radius: 5px;
 }
 
-.smalltext {
-  font-size: 8pt;
-  color: #fff;
-  padding-left: 2px;
-}
-
 .top {
   display: flex;
   flex-direction: row;
@@ -47,4 +41,15 @@
   justify-content: center;
   display: flex;
   align-items: center;
+}
+
+.captext {
+  word-break: keep-all;
+  word-wrap: break-word;
+  font-size: 8pt;
+  color: #fff;
+}
+
+.captext-padding {
+  padding: 3px;
 }

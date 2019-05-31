@@ -34,8 +34,10 @@
 
     <!--课表-->
     <view wx:for="{{wlist}}" wx:key>
-      <view class="flex-item kcb-item" bindtap="showCardView" data-statu="open" data-index="{{index}}" style="margin-left:{{(item.dayWeek-1)*100}}rpx;margin-top:{{(item.no-1)*100+5}}rpx;height:{{item.len*100-5}}rpx;background-color:{{colorArrays[index%8]}}">
-        <view class="smalltext" >{{item.caption}}</view>
+      <view class="flex-item kcb-item" bindtap="showCardView" data-index="{{index}}" style="margin-left:{{(item.dayWeek-1)*100}}rpx;margin-top:{{(item.no-1)*100+5}}rpx;height:{{item.len*100-5}}rpx;background-color:{{colorArrays[index%8]}}">
+        <view class="captext-padding" style="height:{{item.len*100-5}}rpx;width:95rpx;">
+          <text class="captext">{{item.caption}}</text>
+        </view>
       </view>
     </view>
   </view>

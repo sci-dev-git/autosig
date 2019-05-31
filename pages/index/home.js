@@ -290,7 +290,7 @@ Page({
    * @param tasks 列表引用
    */
   planTimelineColors(tasks) {
-    var colors = ['bg-purple', 'bg - blue', 'bg-mauve', 'bg-pink', 'bg-red', 'bg-orange', 'bg-yellow', 'bg-olive', 'bg-green']
+    var colors = ['bg-mauve', 'bg-pink', 'bg-purple', 'bg - blue', 'bg-red', 'bg-orange', 'bg-yellow', 'bg-olive', 'bg-green']
     var colorIdx = 0
     for (var i = 0; i < tasks.length; i++) {
       var task = tasks[i]
