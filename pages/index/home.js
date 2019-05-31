@@ -600,14 +600,14 @@ Page({
    * 单击 - 删除备忘
    */
   onRemoveMemo(e) {
-    var current = e.currentTarget.dataset.memo
+    var memoIdx = e.currentTarget.dataset.memoIdx
     var _this = this
     const db_entry = 'memos'
     try {
       var memos = wx.getStorageSync(db_entry)
       if (memos == null)
         return
-      memos.splice(current.memoIdx, 1)
+      memos.splice(memoIdx, 1)
 
       wx.setStorageSync(db_entry, memos)
       _this.fetchData()

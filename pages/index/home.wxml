@@ -90,7 +90,7 @@
                       </view>
                       <view class='margin-top margin-right'>{{tasks[index].memo.content}}</view>
                       <view class='right-align'>
-                        <view bindtap='onRemoveMemo' class="cu-btn bg-red.light radius shadow tl-button-sign" data-memo="{{tasks[index].memoIdx}}">删除备忘</view>
+                        <view bindtap='onRemoveMemo' class="cu-btn bg-red.light radius shadow tl-button-sign" data-memoIdx="{{tasks[index].memoIdx}}">删除备忘</view>
                       </view>
                     </block> <!-- is memo -->
 
