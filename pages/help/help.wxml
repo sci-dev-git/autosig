@@ -1,5 +1,5 @@
 <cu-custom bgColor="bg-gradual-blue" isBack='true'>
-  <view slot="content">个人中心</view>
+  <view slot="content">帮助</view>
   <view slot="backText">返回</view>
   <view class="action" slot="right">
     <view class="cu-load load-icon {{loading[0] || loading[1] ?'loading':'over'}}"></view>

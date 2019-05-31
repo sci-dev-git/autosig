@@ -49,13 +49,6 @@ Page({
   },
 
   /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function () {
-    
-  },
-
-  /**
    * 生命周期函数--监听页面隐藏
    */
   onHide: function () {
@@ -94,6 +87,8 @@ Page({
    * Helper函数 - 从服务器拉取数据
    */
   fetchData() {
+    if (!app.globalData.canFetchData)
+      return
     this.setData({
       currentGroup: app.globalData.groupedit_currentGroup,
       currentPlace: app.globalData.asusrInfo.place,
@@ -470,11 +465,11 @@ Page({
       acitivityEditMode: false,
       showCreateActivity: true,
       currentActivity: null,
-      activityName: '测试活动',
+      activityName: '',
       activityTime: '12:00',
-      activityDesc: '描述',
-      activityWhere: '明向',
-      activityHost: 'AA',
+      activityDesc: '',
+      activityWhere: '',
+      activityHost: '',
       weekModeCur: 0,
     })
   },
@@ -549,6 +544,23 @@ Page({
    * 单击创建(修改)群组按钮
    */
   onUpdateGroup() {
+    var err = null
+    if (this.data.activityName.length == 0)
+      err = '名称不能为空'
+    else if (this.data.activityWhere.length == 0)
+      err = '地点不能为空'
+    else if (this.data.activityHost.length == 0)
+      err = '主讲人不能为空'
+    else if (this.data.activityDesc.length > 100)
+      err = '描述不能超过100字'
+    if (err != null) {
+      wx.showModal({
+        title: '请完善信息',
+        content: err,
+        showCancel: false
+      })
+      return
+    }
     wx.showLoading({
       title: '请稍后',
     })

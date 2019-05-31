@@ -9,22 +9,20 @@ Page({
    * 页面的初始数据
    */
   data: {
-    showCustomBarBg: false,
-    toolbarForwardHint: '>',
-
     userInfo: null,
     hasUserInfo: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
-
     openId: null,
     hasOpenId: false,
     loginState: 0,
+    updateTime: '',
 
-    canOperate: false,
     attendedGroup: false,
     lenTasks: 0,
     tasks: null,
-    loading: [true, true], // tasks, unread msgs
+    loading: [true, true, false], // tasks, unread msgs, absent
+    showCustomBarBg: false,
+    toolbarForwardHint: '>',
     taskTodo: '--',
     taskFinished: '--',
     taskRatio: '---',
@@ -39,11 +37,6 @@ Page({
       badge: 0,
       name: '公告'
     }, {
-      icon: 'location',
-      color: 'olive',
-      badge: 0,
-      name: '导航'
-    }, {
       icon: 'remind',
       color: 'cyan',
       badge: 0,
@@ -52,7 +45,12 @@ Page({
       icon: 'rank',
       color: 'cyan',
       badge: 0,
-      name: '评测'
+      name: '总表'
+    }, {
+      icon: 'location',
+      color: 'olive',
+      badge: 0,
+      name: '导航'
     }, {
       icon: 'profile',
       color: 'purple',
@@ -64,7 +62,13 @@ Page({
       badge: 0,
       name: '帮助'
     }],
-    showSignState: false
+    showSignState: false,
+    signStateCurrent: null,
+    lenAbsentees: 0,
+    absentees: null,
+    showMemo: false,
+    memoTime: '12:00',
+    memoContent: ''
   },
   /**
    * 生命周期函数--监听页面加载
@@ -128,6 +132,8 @@ Page({
       })
       this.loginStateChanged()
     }
+
+    this.setData({ updateTime: app.globalData.util.currentTime() })
   },
 
   /**
@@ -187,7 +193,6 @@ Page({
         this.setData({ taskTodo: '1' })
         break;
       case 1: // 成功登陆
-        this.setData({ canOperate: true })
         this.fetchData()
         break;
     }
@@ -197,7 +202,7 @@ Page({
    * Helper函数 - 从服务器拉取数据
    */
   fetchData() {
-    if (!this.data.canOperate)
+    if (!app.globalData.canFetchData)
       return
     this.setData({ taskTodo: '--' })
     var _this = this
@@ -208,28 +213,56 @@ Page({
       function (status, data) {
         _this.setData({ 'loading[0]': false })
         if (status.code == 0) {
-          // 对活动时间排序
-          for (var i=0; i < data.size; i++) {
-            for(var j =i+1; j < data.size; j++) {
-              var H = data.tasks[i].activity.startHour;
-              var M = data.tasks[i].activity.startMinute;
-              var mH = data.tasks[j].activity.startHour;
-              var mM = data.tasks[j].activity.startMinute;
-              if (app.globalData.util.compareTime([H,M], [mH,mM]) > 0) {
-                var tmp = data.tasks[i]
-                data.tasks[i] = data.tasks[j]
-                data.tasks[j] = tmp
+          // 获取备忘数据
+          // TODO: 合并到远程服务器
+          const db_entry = 'memos'
+          var i = data.size;
+          while (i--) {
+            data.tasks[i].isMemo = false
+          }
+          try {
+            var memos = wx.getStorageSync(db_entry)
+            if (memos != null) {
+              var i = memos.length
+              while (i--) {
+                data.tasks.push({
+                  isMemo: true,
+                  memoIdx: i,
+                  activity: {
+                    startHour: parseInt(memos[i].time.split(':')[0]),
+                    startMinute: parseInt(memos[i].time.split(':')[1])
+                  },
+                  memo: memos[i]
+                })
               }
             }
+            // 对活动时间排序
+            for (var i = 0; i < data.tasks.length; i++) {
+              for (var j = i + 1; j < data.tasks.length; j++) {
+                var H = data.tasks[i].activity.startHour;
+                var M = data.tasks[i].activity.startMinute;
+                var mH = data.tasks[j].activity.startHour;
+                var mM = data.tasks[j].activity.startMinute;
+                if (app.globalData.util.compareTime([H, M], [mH, mM]) > 0) {
+                  var tmp = data.tasks[i]
+                  data.tasks[i] = data.tasks[j]
+                  data.tasks[j] = tmp
+                }
+              }
+            }
+            // 为时间轴配色
+            _this.planTimelineColors(data.tasks)
+            // 刷新界面
+            _this.setData({
+              attendedGroup: (data.num_attended_groups > 0 || data.num_created_groups > 0),
+              lenTasks: data.size,
+              tasks: data.tasks,
+              taskTodo: data.num_todo + memos.length,
+              updateTime: app.globalData.util.currentTime()
+            })
+          } catch(e) {
           }
-          // 为时间轴配色
-          _this.planTimelineColors(data.tasks)
-          _this.setData({
-            attendedGroup: (data.num_attended_groups > 0 || data.num_created_groups > 0),
-            lenTasks: data.size,
-            tasks: data.tasks,
-            taskTodo: data.num_todo
-          })
+            
         } else {
           api.showError(status)
         }
@@ -257,7 +290,7 @@ Page({
    * @param tasks 列表引用
    */
   planTimelineColors(tasks) {
-    var colors = ['bg-blue', 'bg-purple', 'bg-mauve', 'bg-pink', 'bg-red', 'bg-orange', 'bg-yellow', 'bg-olive', 'bg-green']
+    var colors = ['bg-purple', 'bg - blue', 'bg-mauve', 'bg-pink', 'bg-red', 'bg-orange', 'bg-yellow', 'bg-olive', 'bg-green']
     var colorIdx = 0
     for (var i = 0; i < tasks.length; i++) {
       var task = tasks[i]
@@ -307,7 +340,7 @@ Page({
    * Helper函数 - 在登陆未完成时，不能跳转到其它页面
    */
   switchPage(callback) {
-    if (this.data.canOperate) {
+    if (app.globalData.loginState == 1) {
       callback()
     } else {
       wx.showModal({
@@ -341,6 +374,7 @@ Page({
    * 单击 主导航栏
    */
   onMainNaviTap(e) {
+    var _this = this
     var index = e.currentTarget.dataset.id
     switch (index) {
       case 0:
@@ -353,13 +387,26 @@ Page({
         break;
       case 2:
         this.switchPage(function () {
-          app.globalData.util.gotoPage('/pages/navigator/navigator')
+          _this.setData({ showMemo: true })
         })
         break;
       case 3:
         this.switchPage(function () {
-          app.globalData.util.gotoPage('/pages/memo/memo')
+          app.globalData.util.gotoPage('/pages/summary/summary')
         })
+        break;
+      case 4:
+        this.switchPage(function () {
+          app.globalData.util.gotoPage('/pages/navigator/navigator')
+        })
+        break;
+      case 5:
+        this.switchPage(function () {
+          app.globalData.util.gotoPage('/pages/center/center')
+        })
+        break;
+      case 6:
+        app.globalData.util.gotoPage('/pages/help/help')
         break;
     }
   },
@@ -454,8 +501,30 @@ Page({
   /**
    * 单击 查看签到
    */
-  onQuerySignState() {
-
+  onQuerySignState(e) {
+    var task = e.currentTarget.dataset.task;
+    this.setData({
+      showSignState: true,
+      signStateCurrent: task
+    })
+    var _this = this
+    this.setData({ 'loading[2]': true })
+    api.getAbsentees(
+      task.activity.uid,
+      task.group.uid,
+      app.globalData.token,
+      function (status, data) {
+        _this.setData({ 'loading[2]': false })
+        if (status.code == 0) {
+          _this.setData({
+            lenAbsentees: data.size,
+            absentees: data.absentees
+          })
+        } else {
+          api.showError(status)
+        }
+      }
+    )
   },
 
   /**
@@ -463,5 +532,91 @@ Page({
    */
   onHideSignState() {
     this.setData({ showSignState: false })
+  },
+
+  /**
+   * 隐藏 备忘
+   */
+  onHideMemo() {
+    this.setData({ showMemo: false })
+  },
+
+  /**
+   * 编辑备忘
+   */
+  bindMemoContentInput(e) {
+    this.setData({ memoContent: e.detail.value })
+  },
+  onMemoTimeChange(e) {
+    this.setData({ memoTime: e.detail.value })
+  },
+
+  /**
+   * 单击 - 添加备忘
+   */
+  onCreateMemo() {
+    var err = null
+    if (this.data.memoContent.length == 0)
+      err = '请输入备忘内容'
+    if (err != null) {
+      wx.showModal({
+        title: '请完善信息',
+        content: err,
+        showCancel: false
+      })
+      return
+    }
+    var _this = this
+    const db_entry = 'memos'
+   
+      // todo: sync data to the remote
+      var memos = null
+      try {
+        memos = wx.getStorageSync(db_entry)
+      } catch(e) {
+      }
+      if (!memos)
+        memos = []
+      let memo = {
+        content: _this.data.memoContent,
+        time: _this.data.memoTime
+      }
+     memos.push(memo)
+      try {
+        wx.setStorageSync(db_entry,memos)
+        _this.onHideMemo()
+        _this.fetchData()
+      } catch(e) {
+        console.info(e)
+        wx.showModal({
+          title: '提示',
+          content: '提交失败',
+          showCancel: false
+        })
+      }
+  },
+
+  /**
+   * 单击 - 删除备忘
+   */
+  onRemoveMemo(e) {
+    var current = e.currentTarget.dataset.memo
+    var _this = this
+    const db_entry = 'memos'
+    try {
+      var memos = wx.getStorageSync(db_entry)
+      if (memos == null)
+        return
+      memos.splice(current.memoIdx, 1)
+
+      wx.setStorageSync(db_entry, memos)
+      _this.fetchData()
+    } catch(e) {
+      wx.showModal({
+        title: '提示',
+        content: '提交失败',
+        showCancel: false
+      })
+    }
   }
 })

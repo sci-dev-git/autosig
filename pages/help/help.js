@@ -1,4 +1,4 @@
-// pages/memo/memo.js
+// pages/help/help.js
 Page({
 
   /**

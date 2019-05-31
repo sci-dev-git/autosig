@@ -1,37 +1,36 @@
 //app.js
 const util = require('utils/util')
 App({
-  onLaunch: function() {
-    // 展示本地存储能力
-    var logs = wx.getStorageSync('logs') || []
-    logs.unshift(Date.now())
-    wx.setStorageSync('logs', logs)
-    
-    // 登录
+  /**
+   * Helper函数 - 登陆独步校园
+   */
+  doLogin() {
+    this.globalData.canFetchData = false
     this.globalData.loginState = 0
     wx.login({
       success: res => {
         // 发送 res.code 到后台换取 openId, sessionKey, unionId
         var api = require('/service/autosig-apis')
-        var _this = this
+        var that = this
         api.login(
           res.code,
-          function(status, data) {
+          function (status, data) {
+            that.globalData.inRelogin = false
             switch (status.msg) {
               case 'E_OK':
                 // 成功登陆 发送openId到后台
-                _this.loginAutosig(data)
+                that.loginAutosig(data)
                 break;
               case 'E_USER_NON_EXISTING':
                 // 用户不存在, 请求绑定. 发送openId到后台
-                _this.globalData.openId = data.openId
-                _this.globalData.loginState = 2
-                _this.updateLoginState()
+                that.globalData.openId = data.openId
+                that.globalData.loginState = 2
+                that.updateLoginState()
                 break;
               default:
                 // 服务出错
-                _this.globalData.loginState = 3
-                _this.updateLoginState()
+                that.globalData.loginState = 3
+                that.updateLoginState()
                 api.showError(status)
             }
           })
@@ -53,12 +52,6 @@ App({
               if (this.userInfoReadyCallback) {
                 this.userInfoReadyCallback(res)
               }
-              if (this.userInfoReadyCallback2) {
-                this.userInfoReadyCallback2(res)
-              }
-              if (this.userInfoReadyCallback3) {
-                this.userInfoReadyCallback3(res)
-              }
             }
           })
         } else {
@@ -69,6 +62,15 @@ App({
         }
       }
     })
+  },
+  onLaunch: function() {
+    // 展示本地存储能力
+    var logs = wx.getStorageSync('logs') || []
+    logs.unshift(Date.now())
+    wx.setStorageSync('logs', logs)
+    
+    // 登录
+    this.doLogin()
     // 获取系统状态栏信息
     wx.getSystemInfo({
       success: e => {
@@ -88,12 +90,22 @@ App({
     this.globalData.asusrInfo = resp.info
     this.globalData.loginState = 1
     this.globalData.token = resp.token
+    this.globalData.canFetchData = true
     this.updateLoginState()
   },
   updateLoginState() {
     if (this.loginStateCallback) {
       this.loginStateCallback()
     }
+  },
+  /**
+   * 公开函数：重新登陆
+   */
+  relogin() {
+    if (this.globalData.inRelogin) // 避免重复发起重登录命令
+      return
+    this.globalData.inRelogin = true
+    this.doLogin()
   },
   globalData: {
     util: util,
@@ -103,6 +115,8 @@ App({
     token: null,
     loginState: 0, // 0 = logining, 1 = login, 2 = not login, 3 = error
     authRequired: false, // true=要求授权
+    canFetchData: false, // 标明子页面可以从服务器拉取数据
+    inRelogin: false,
 
     groupedit_currentGroup: null,
     groupedit_manageGroup: false

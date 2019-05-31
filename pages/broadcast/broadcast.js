@@ -28,6 +28,8 @@ Page({
    * Helper函数 - 从服务器拉取数据
    */
   fetchData() {
+    if (!app.globalData.canFetchData)
+      return
     var _this = this
     // 获取当前消息
     this.setData({ 'loading[0]': true })

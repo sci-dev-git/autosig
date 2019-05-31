@@ -5,8 +5,8 @@ Page({
   data: {
     tabCur: 0,
     showSearchResults: false,
-    groupName: '测试群组 2',
-    groupDesc: 'TFEEWLIGNJERKGJKBFEWBFWLGVNWWL WENFWLJGKWKVL WKNF KGWG W GWGW EWJKFGRGGNWGWB BER,BGL',
+    groupName: '',
+    groupDesc: '',
     loading: [false, false, false, false, false], // nearby, attended, created, search, mac
     nearbyGroups: null,
     lenNearbyGroups: 0,
@@ -30,6 +30,8 @@ Page({
    * Helper函数 - 从服务器拉取数据
    */
   fetchData() {
+    if (!app.globalData.canFetchData)
+      return
     var _this = this
     // 获取附近的群组
     this.setData({'loading[0]': true})
@@ -139,7 +141,7 @@ Page({
     var err = null
     if (this.data.groupName.length == 0)
       err = '群名称不能为空'
-    else if(this.data.groupDesc > 100)
+    else if(this.data.groupDesc.length > 100)
       err = '群描述不能超过100字'
     if (err != null) {
       wx.showModal({

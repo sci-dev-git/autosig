@@ -3,6 +3,7 @@
  * 在确认已经完成userInfo和openId的获取前，不得提前加载该页面。
  */
 const app = getApp()
+const api = require('../../service/autosig-apis')
 
 Page({
   data: {
@@ -11,14 +12,13 @@ Page({
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
 
     place_names: ['太原理工大学'],
-    cur_sch: '选择学校',
     StatusBar: app.globalData.StatusBar,
     CustomBar: app.globalData.CustomBar,
     motto: '欢迎进入独步校园！',
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
-    place: '太原理工大学',
-    userCode: '2018',
-    userName: 'AAA'
+    index: 0,
+    userCode: '',
+    userName: ''
   },
   onLoad: function () {
     this.setData({
@@ -40,14 +40,13 @@ Page({
       })
       return
     }
-    var api = require('../../service/autosig-apis')
     var _this = this
     wx.showLoading({
       title: '请稍后',
     })
     api.reg(
       this.data.openId,
-      this.data.place,
+      this.data.place_names[this.data.index],
       this.data.userCode,
       this.data.userName,
 
@@ -67,6 +66,7 @@ Page({
   onPlaceChanged(e) {
     var index = e.detail.value
     this.setData({
+      index: index,
       place: this.data.place_names[index]
     })
   },

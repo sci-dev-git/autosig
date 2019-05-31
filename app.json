@@ -5,8 +5,10 @@
     "pages/logs/logs",
     "pages/groups/groupedit/groupedit",
     "pages/broadcast/broadcast",
-    "pages/memo/memo",
-    "pages/navigator/navigator"
+    "pages/navigator/navigator",
+    "pages/center/center",
+    "pages/help/help",
+    "pages/summary/summary"
   ],
   "window": {
     "backgroundTextStyle": "light",

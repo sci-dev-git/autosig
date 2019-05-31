@@ -73,6 +73,7 @@
     </block>
     <block wx:if="{{loginState == 1 && attendedGroup || loginState == 2 }}">
       <view class='sign-scroll-view'>
+
         <view class="cu-timeline sign-timeline">
           <view class="cu-time font-size" bindtap='fetchData'>今日任务</view>
           
@@ -81,37 +82,52 @@
               <view class="cu-time">{{sdisp.timestr(tasks[index].activity.startHour, tasks[index].activity.startMinute)}}</view>
                 <view class="cu-item">
                   <view class="{{tasks[index].bgcolor}} radius shadow-blur content">
-                    <view class="cu-capsule">
-                      <view class="cu-tag bg-gray">{{tasks[index].group.name}}</view>
-                      <view class="cu-tag line-white">{{tasks[index].activity.name}}</view>
-                    </view>
-                    
-                    <view class='margin-top margin-right'>{{tasks[index].activity.desc}}</view>
-                    <view class='margin-top-sm margin-right'>地点：{{tasks[index].activity.where}}</view>
-                    <view class='margin-top-sm margin-right'>主讲：{{tasks[index].activity.host}}</view>
-                    <view class='right-align'>
-                      <view>
-                        <block wx:if="{{tasks[index].managed}}">
-                          <block wx:if="{{!tasks[index].sign_ended}}">
-                            <button class="cu-btn bg-red.light radius shadow tl-button-sign" data-task="{{tasks[index]}}" bindtap='onSetSign'>{{tasks[index].activity.signStarted?'结束签到':'发起签到'}}</button>
-                          </block>
-                          <block wx:if="{{tasks[index].sign_ended}}">
-                            <button class="cu-btn bg-red.light radius shadow tl-button-sign" data-task="{{tasks[index]}}" bindtap='onQuerySignState'>{{tasks[index].num_absent ? '未签到：（' + tasks[index].num_absent + '）人' : '全勤'}}</button>
-                          </block>
-                        </block>
-                        <block wx:else>
-                          <block wx:if="{{!tasks[index].sign_ended}}">
-                            <button wx:if="{{tasks[index].activity.signStarted && !tasks[index].signed}}" class="bg-cyan.light cuIcon-post radius shadow tl-button-sign" data-task="{{tasks[index]}}" bindtap='onSignin'>签到</button>
-                          </block>
-                          <block wx:if="{{tasks[index].signed}}">
-                            已签到
-                          </block>
-                          <block wx:if="{{tasks[index].sign_ended && tasks[index].sign_missed}}">
-                            错过签到！
-                          </block>
-                        </block>
+
+                    <block wx:if="{{tasks[index].isMemo}}">
+                      <view class="cu-capsule">
+                        <view class="cu-tag bg-gray">备忘</view>
+                        <view class="cu-tag line-white">{{tasks[index].memo.time}}</view>
                       </view>
-                    </view>
+                      <view class='margin-top margin-right'>{{tasks[index].memo.content}}</view>
+                      <view class='right-align'>
+                        <view bindtap='onRemoveMemo' class="cu-btn bg-red.light radius shadow tl-button-sign" data-memo="{{tasks[index].memoIdx}}">删除备忘</view>
+                      </view>
+                    </block> <!-- is memo -->
+
+                    <block wx:else>
+                      <view class="cu-capsule">
+                        <view class="cu-tag bg-gray">{{tasks[index].group.name}}</view>
+                        <view class="cu-tag line-white">{{tasks[index].activity.name}}</view>
+                      </view>
+                      
+                      <view class='margin-top margin-right'>{{tasks[index].activity.desc}}</view>
+                      <view class='margin-top-sm margin-right'>地点：{{tasks[index].activity.where}}</view>
+                      <view class='margin-top-sm margin-right'>主讲：{{tasks[index].activity.host}}</view>
+                      <view class='right-align'>
+                        <view>
+                          <block wx:if="{{tasks[index].managed}}">
+                            <block wx:if="{{!tasks[index].sign_ended}}">
+                              <view bindtap='onSetSign' class="cu-btn bg-red.light radius shadow tl-button-sign" data-task="{{tasks[index]}}">{{tasks[index].activity.signStarted?'结束签到':'发起签到'}}</view>
+                            </block>
+                            <block wx:if="{{tasks[index].sign_ended}}">
+                              <view bindtap='onQuerySignState' class="cu-btn bg-red.light radius shadow" data-task="{{tasks[index]}}">{{tasks[index].num_absent ? '未签到（' + tasks[index].num_absent + '）人' : '全勤'}}</view>
+                            </block>
+                          </block>
+                          <block wx:else>
+                            <block wx:if="{{!tasks[index].sign_ended}}">
+                              <view wx:if="{{tasks[index].activity.signStarted && !tasks[index].signed}}" class="cu-btn bg-cyan.light cuIcon-post radius shadow tl-button-sign" data-task="{{tasks[index]}}" bindtap='onSignin'>签到</view>
+                            </block>
+                            <block wx:if="{{tasks[index].signed}}">
+                              已签到
+                            </block>
+                            <block wx:if="{{tasks[index].sign_ended && tasks[index].sign_missed}}">
+                              错过签到！
+                            </block>
+                          </block>
+                        </view>
+                      </view>
+
+                    </block> <!-- !is memo -->
 
                   </view>
                 </view>
@@ -147,8 +163,11 @@
             </view>
           </block>
 
-        </view>
-      </view>
+        </view> <!-- cu-timeline -->
+        <view class="margin cu-time font-size text-gray" bindtap='fetchData'>上次更新：{{updateTime}}</view>
+          
+      </view> <!-- sign-scroll-view -->
+      
     </block>
 
     <block wx:if="{{loginState == 1 && loading[0]}}">
@@ -166,7 +185,9 @@
   </view>
  </scroll-view>
  
-<!-- modal窗口: 添加活动 -->
+<!--
+  modal窗口: 查看签到记录
+  -->
 <view class="cu-modal {{showSignState?'show':''}}">
   <view class="cu-dialog">
     <view class="cu-bar bg-white justify-end">
@@ -176,61 +197,71 @@
       </view>
     </view>
 
-    <!-- FIXME wx:if : seems a bug of wx native widget -->
-    <block wx:if='{{showCreateActivity}}'>
-      <scroll-view scroll-y bindscroll='onModalScroll' class='create-act-size'>
+    <scroll-view scroll-y class='create-act-size'>
+      <view class="padding">
+        <form>
+          <view class="cu-form-group">
+            <view class="title">{{'未签到（' + signStateCurrent.num_absent + '）人'}}</view>
+          </view>
+          <block wx:if="{{lenAbsentees>0}}">
+            <view class="cu-list menu-avatar no-padding">
+              <block wx:for="{{absentees}}" wx:key>
+                <view class="cu-item">
+                  <view class="cu-avatar round lg">U</view>
+                  <view class="content flex flex-direction align-start">
+                    <text class="text-abc text-grey">姓名：{{absentees[index].realName}}</text>
+                    <text class="text-abc text-grey ">证件号：{{absentees[index].code}}</text>
+                  </view>
+                </view>
+              </block>
+            </view>
+          </block>
+          <block wx:else>
+            <view class="cu-load bg-white {{loading[2] ? 'loading':'over'}}}}"></view>
+          </block>
+        </form>
+      </view>
+    </scroll-view>
+
+  </view>
+</view>
+
+
+<!--
+  modal窗口: 添加备忘
+  -->
+<view class="cu-modal {{showMemo?'show':''}}">
+  <view class="cu-dialog">
+    <view class="cu-bar bg-white justify-end">
+      <view class="content">添加备忘</view>
+      <view class="action" bindtap="onHideMemo">
+        <text class="cuIcon-close text-red"></text>
+      </view>
+    </view>
+
+    <block wx:if="{{showMemo}}">
+      <scroll-view scroll-y class='create-act-size'>
         <view class="padding">
           <form>
             <view class="cu-form-group">
-              <view class="title">名称</view>
-              <input disabled='{{!showCreateActivity}}' value="{{activityName}}" placeholder="输入活动名称" bindinput="bindActivityNameInput"></input>
+              <view class="title">内容</view>
+              <input disabled='{{!showMemo}}' placeholder="输入备忘内容" bindinput="bindMemoContentInput"></input>
               <text class="cuIcon-edit"></text>
             </view>
             <view class="cu-form-group">
-              <view class="title">星期{{sdisp.getDayStr(daySelectorCur)}} / 周数</view>
-              <picker mode="time" value="{{activityTime}}" start="05:00" end="23:00" bindchange="onActivityTimeChange">
+              <view class="title">时间</view>
+              <picker mode="time" value="{{memoTime}}" start="00:00" end="23:59" bindchange="onMemoTimeChange">
                 <view class="picker">
-                  {{activityTime}}
+                  {{memoTime}}
                 </view>
               </picker>
             </view>
-            <view class="cu-form-group">
-              <scroll-view scroll-x class="bg-white nav text-center">
-                <view class="cu-item {{0==weekModeCur?'bg-cyan.light cur':''}}" bindtap="onSwitchWeekMode" data-mode="{{0}}">全部</view>
-                <view class="cu-item {{1==weekModeCur?'bg-cyan.light cur':''}}" bindtap="onSwitchWeekMode" data-mode="{{1}}">单周</view>
-                <view class="cu-item {{2==weekModeCur?'bg-cyan.light cur':''}}" bindtap="onSwitchWeekMode" data-mode="{{2}}">双周</view>
-              </scroll-view>
-            </view>
-            <view class="cu-form-group">
-              <view class='cu-list grid col-5 no-border'>
-                <block wx:for="{{25}}" wx:for-index="week" wx:key>
-                  <text class="tb-block {{weekSelected[week] ? 'bg-cyan' : 'bg-white'}}" bindtap='onWeekTap' data-cur='{{week}}'>{{week+1}}</text>
-                </block>
-              </view>
-            </view>
-            <view class="cu-form-group">
-              <view class="title">地点</view>
-              <input maxlength="100" disabled='{{!showCreateActivity}}' bindinput="bindActivityWhereInput"  value="{{activityWhere}}" placeholder="输入活动地点"></input>
-            </view>
-            <view class="cu-form-group">
-              <view class="title">主讲</view>
-              <input  maxlength="100" disabled='{{!showCreateActivity}}' bindinput="bindActivityHostInput"  value="{{activityHost}}" placeholder="输入活动主讲"></input>
-            </view>
-            <view class="cu-form-group align-start">
-              <view class="title">简介</view>
-              <!-- FIXME disabled : seems a bug of wx native widget -->
-              <textarea maxlength="100" disabled='{{!showCreateActivity}}'  bindinput="bindActivityDescInput"  value="{{activityDesc}}" placeholder="输入活动描述（100字以内）"></textarea>
-            </view>
-            <view class="cu-form-group right-align align-center">
-              <template is='place-capsule'/>
-            </view>
             <view class="padding">
-              <button class="cu-btn block bg-blue.light margin-tb-sm lg" bindtap='onUpdateGroup'>{{acitivityEditMode?'修改':'创建'}}</button>
+              <button class="cu-btn block bg-blue.light margin-tb-sm lg" bindtap='onCreateMemo'>创建</button>
             </view>
           </form>
         </view>
       </scroll-view>
-      <text class='cuIcon-refresharrow text-gray margin'> 向下拖动</text>
     </block>
 
   </view>

@@ -16,7 +16,7 @@
   <view class="title">学校</view>
   <picker bindchange="onPlaceChanged" value="{{index}}" range="{{place_names}}">
     <view class="picker">
-      {{index?place_names[index]:place}}
+      {{place_names[index]}}
     </view>
   </picker>
 </view>

@@ -18,8 +18,8 @@
 
 const app = getApp()
 
-//const apiHost = "https://autosigs.applinzi.com";
-const apiHost = "http://localhost:5050"; // for debug
+const apiHost = "https://autosigs.applinzi.com";
+//const apiHost = "http://localhost:5050"; // for debug
 
 function requestAPI(url, callback, opaque) {
   wx.request({
@@ -34,6 +34,9 @@ function requestAPI(url, callback, opaque) {
           var msg = responseObj.status.msg
           var code = responseObj.status.code
           console.warn('autosig-api: server returns: msg = '+msg+', code = '+code)
+
+          if (responseObj.status.msg == 'E_TOKEN_AUTH')
+            app.relogin()
         }
         callback(responseObj.status, responseObj.data, opaque);
       } catch(e) {
@@ -357,7 +360,33 @@ module.exports.getTasks = function (token, callback) {
     throwParamCheckError(callback)
     return
   }
-  requestAPI(`${apiHost}/usr/tasks?token=${token}`, callback)
+  requestAPI(`${apiHost}/task/today?token=${token}`, callback)
+}
+
+/**
+ * 获取所有任务列表接口
+ * @param weekno -1表示当前周
+ * @param token 用于内部认证的唯一凭证
+ */
+module.exports.getAllTasks = function (weekno, token, callback) {
+  if (weekno == null || token == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/task/all_tasks?weekno=${weekno}&token=${token}`, callback)
+}
+
+/**
+ * 获取缺席者列表的接口
+ * @param uid 目标活动的uid
+ * @param token 用于内部认证的唯一凭证
+ */
+module.exports.getAbsentees = function (uid, group_uid, token, callback) {
+  if (uid == null || group_uid == null || token == null) {
+    throwParamCheckError(callback)
+    return
+  }
+  requestAPI(`${apiHost}/task/absentees?&uid=${uid}&group_uid=${group_uid}&token=${token}`, callback)
 }
 
 /**
@@ -447,8 +476,9 @@ module.exports.msgMarkRead = function (uids, token, callback) {
     throwParamCheckError(callback)
     return
   }
-  requestAPI(`${apiHost}/usr/unread_msgs?&token=${token}`, callback)
+  requestAPI(`${apiHost}/broadcast/unread_msgs?&token=${token}`, callback)
 }
+
 
 var errDisplayed = false; // 对于多个异步请求同时抛出错误的情况，只反馈最早的错误
 
@@ -466,7 +496,7 @@ module.exports.showError = function(status) {
       case 'E_SERVER_FAULT':
         err = '服务正忙'; break;
       case 'E_TOKEN_AUTH':
-        err = '验证失败'; break;
+        err = '验证失败，正在重新登陆'; break;
       case 'E_USER_EXISTING':
         err = '用户已存在'; break;
       case 'E_USER_NON_EXISTING':
