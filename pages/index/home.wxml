@@ -71,12 +71,37 @@
     <block wx:if="{{loginState == 0}}">
       <template is='loadingIndicator' data="{{text:'登陆中，请稍后',swt:true}}"/>
     </block>
-    <block wx:if="{{loginState == 1 && attendedGroup || loginState == 2 }}">
+    
+    <block wx:if="{{loginState == 1 && loading[0]}}">
+      <template is='loadingIndicator' data="{{text:'加载中，请稍后'}}"/>
+    </block>
+
+     <!--
+      显示“加入群组”提示：
+      已登录并完成加载, 但没有加入/创建群组
+    -->
+    <block wx:if="{{loginState == 1 && !loading[0] && !attendedGroup}}">
+      <view class='goto-group'>
+        <image mode='aspectFit' src='/assets/attendedGroup.png'></image>
+        <text class='margin'>哎呀，你还没有加入任何群组！</text>
+        <button class="cu-btn margin-tb-sm round lines-cyan shadow"role="button"aria-label=""aria-disabled="false" bindtap='onAddGroup'>加入群组</button>
+      </view>
+    </block>
+    
+    <!--
+      同时满足如下两种情况显示时间轴
+      1、已登录并加载完成,并且已经加入/创建群组；
+      2、未登录，要求绑定
+     -->
+    <block wx:if="{{(loginState == 1 && !loading[0] && attendedGroup) || loginState == 2 }}">
       <view class='sign-scroll-view'>
 
         <view class="cu-timeline sign-timeline">
           <view class="cu-time font-size" bindtap='fetchData'>今日任务</view>
           
+          <!--
+          login state = 1
+          -->
           <block wx:if="{{loginState == 1 && attendedGroup}}">
             <block wx:for="{{tasks}}" wx:key>
               <view class="cu-time">{{sdisp.timestr(tasks[index].activity.startHour, tasks[index].activity.startMinute)}}</view>
@@ -132,19 +157,21 @@
                   </view>
                 </view>
             </block>
-
-            <block wx:if="{{lenTasks==0}}">
-              <view class='cu-item'>
-                <view class="bg-cyan radius shadow-blur content">
-                  <text class='cu-load over'></text>
-                </view>
-              </view>
-            </block>
-
           </block>
-          
+
+          <block wx:if="{{loginState == 1 && lenTasks==0}}">
+            <view class='cu-item'>
+              <view class="bg-cyan radius shadow-blur content">
+                <text class='cu-load over'></text> <!-- 没有更多 -->
+              </view>
+            </view>
+          </block>
+
+          <!--
+          login state = 2
+          -->
           <block wx:if="{{loginState == 2}}">
-            <view class="cu-time">14:00</view>
+            <view class="cu-time">{{updateTimeHM}}</view>
             <view class="cu-item">
               <view class="bg-cyan radius shadow-blur content">
                 <view class="cu-capsule">
@@ -167,19 +194,7 @@
         <view class="margin cu-time font-size text-gray" bindtap='fetchData'>上次更新：{{updateTime}}</view>
           
       </view> <!-- sign-scroll-view -->
-      
-    </block>
 
-    <block wx:if="{{loginState == 1 && loading[0]}}">
-      <template is='loadingIndicator' data="{{text:'加载中，请稍后'}}"/>
-    </block>
-
-    <block wx:if="{{loginState == 1 && !loading[0] && !attendedGroup}}">
-      <view class='goto-group'>
-        <image mode='aspectFit' src='/assets/attendedGroup.png'></image>
-        <text class='margin'>哎呀，你还没有加入任何群组！</text>
-        <button class="cu-btn margin-tb-sm round lines-cyan shadow"role="button"aria-label=""aria-disabled="false" bindtap='onAddGroup'>加入群组</button>
-      </view>
     </block>
 
   </view>

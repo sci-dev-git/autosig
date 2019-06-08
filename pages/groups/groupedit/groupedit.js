@@ -9,7 +9,6 @@ Page({
    */
   data: {
     currentGroup: null,
-    currentPlace: '',
     manageGroup: false,
     lenMembers: 0,
     members: null,
@@ -91,7 +90,6 @@ Page({
       return
     this.setData({
       currentGroup: app.globalData.groupedit_currentGroup,
-      currentPlace: app.globalData.asusrInfo.place,
       manageGroup: app.globalData.groupedit_manageGroup,
       groupName: app.globalData.groupedit_currentGroup.name,
       groupDesc: app.globalData.groupedit_currentGroup.desc,
@@ -256,26 +254,25 @@ Page({
    * Helper函数 - 切换单双周模式
    */
   switchWeekMode(mode) {
+    var sels = []
     switch (mode) {
       case 0: // 全部
         for (var i = 0; i < 25; i++) {
-          var dict = 'weekSelected[' + i + ']'
-          this.setData({ [dict]: true })
+          sels[i] = true
         }
         break
       case 1: // 单周
         for (var i = 1; i <= 25; i++) {
-          var dict = 'weekSelected[' + (i - 1) + ']'
-          this.setData({ [dict]: (i % 2) })
+          sels[i-1] = (i % 2)
         }
         break
       case 2: // 双周
         for (var i = 1; i <= 25; i++) {
-          var dict = 'weekSelected[' + (i-1) + ']'
-          this.setData({ [dict]: (i % 2 == 0) })
+          sels[i-1] = (i % 2 == 0)
         }
         break
     }
+    this.setData({ weekSelected: sels })
   },
   /**
    * Helper函数 - 确定当前所处的单双周模式
@@ -503,11 +500,11 @@ Page({
     })
     this.resolveWeekMode(group.weeks)
     // 恢复周选择器数据
-    for (var i = 0; i < 25; i++) {
-      var sel = this.contains(group.weeks, i+1)
-      var dict = 'weekSelected[' + i + ']'
-      this.setData({ [dict]: sel })
+    var sels = this.data.weekSelected
+    for (var i = 0; i < 25; i++) { 
+      sels[i] = this.contains(group.weeks, i + 1)
     }
+    this.setData({weekSelected: sels})
   },
   /**
    * 关闭 添加活动对话框

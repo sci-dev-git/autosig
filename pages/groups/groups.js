@@ -114,7 +114,11 @@ Page({
       function (status, data) {
         wx.hideLoading()
         if (status.code == 0) {
-          _this.fetchData()
+          if (app.globalData.joinGroupNaviBack) {
+            wx.navigateBack() // 当用户未加入群组时，直接退回主页面
+          } else {
+            _this.fetchData()
+          }
         } else {
           api.showError(status)
         }

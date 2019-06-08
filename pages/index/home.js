@@ -16,6 +16,7 @@ Page({
     hasOpenId: false,
     loginState: 0,
     updateTime: '',
+    updateTimeHM: '',
 
     attendedGroup: false,
     lenTasks: 0,
@@ -133,7 +134,10 @@ Page({
       this.loginStateChanged()
     }
 
-    this.setData({ updateTime: app.globalData.util.currentTime() })
+    this.setData({
+      updateTime: app.globalData.util.currentTime(),
+      updateTimeHM: app.globalData.util.currentTimeHM()
+    })
   },
 
   /**
@@ -206,63 +210,72 @@ Page({
       return
     this.setData({ taskTodo: '--' })
     var _this = this
+
     // 获取今日任务
-    this.setData({ 'loading[0]': true })
+    if (this.data.lenTasks == 0) {
+      this.setData({ 'loading[0]': true })
+    }
     api.getTasks(
       app.globalData.token,
       function (status, data) {
-        _this.setData({ 'loading[0]': false })
         if (status.code == 0) {
-          // 获取备忘数据
+          // 群组状态（注意else分支不要对称处理）
+          app.globalData.attendedGroup = (data.num_attended_groups > 0 || data.num_created_groups > 0)
+          app.globalData.joinGroupNaviBack = (data.num_attended_groups == 0)
+          _this.setData({
+            'loading[0]': false,
+            attendedGroup: app.globalData.attendedGroup
+          })
+          // 获取备忘录数据
           // TODO: 合并到远程服务器
           const db_entry = 'memos'
           var i = data.size;
           while (i--) {
             data.tasks[i].isMemo = false
           }
+          var memos = null
           try {
-            var memos = wx.getStorageSync(db_entry)
-            if (memos != null) {
-              var i = memos.length
-              while (i--) {
-                data.tasks.push({
-                  isMemo: true,
-                  memoIdx: i,
-                  activity: {
-                    startHour: parseInt(memos[i].time.split(':')[0]),
-                    startMinute: parseInt(memos[i].time.split(':')[1])
-                  },
-                  memo: memos[i]
-                })
-              }
-            }
-            // 对活动时间排序
-            for (var i = 0; i < data.tasks.length; i++) {
-              for (var j = i + 1; j < data.tasks.length; j++) {
-                var H = data.tasks[i].activity.startHour;
-                var M = data.tasks[i].activity.startMinute;
-                var mH = data.tasks[j].activity.startHour;
-                var mM = data.tasks[j].activity.startMinute;
-                if (app.globalData.util.compareTime([H, M], [mH, mM]) > 0) {
-                  var tmp = data.tasks[i]
-                  data.tasks[i] = data.tasks[j]
-                  data.tasks[j] = tmp
-                }
-              }
-            }
-            // 为时间轴配色
-            _this.planTimelineColors(data.tasks)
-            // 刷新界面
-            _this.setData({
-              attendedGroup: (data.num_attended_groups > 0 || data.num_created_groups > 0),
-              lenTasks: data.size,
-              tasks: data.tasks,
-              taskTodo: data.num_todo + memos.length,
-              updateTime: app.globalData.util.currentTime()
-            })
-          } catch(e) {
+            memos = wx.getStorageSync(db_entry)
+          } catch (e) {
           }
-            
+          if (memos != null) {
+            var i = memos.length
+            while (i--) {
+              data.tasks.push({
+                isMemo: true,
+                memoIdx: i,
+                activity: {
+                  startHour: parseInt(memos[i].time.split(':')[0]),
+                  startMinute: parseInt(memos[i].time.split(':')[1])
+                },
+                memo: memos[i]
+              })
+            }
+          }
+          // 对活动时间排序
+          for (var i = 0; i < data.tasks.length; i++) {
+            for (var j = i + 1; j < data.tasks.length; j++) {
+              var H = data.tasks[i].activity.startHour;
+              var M = data.tasks[i].activity.startMinute;
+              var mH = data.tasks[j].activity.startHour;
+              var mM = data.tasks[j].activity.startMinute;
+              if (app.globalData.util.compareTime([H, M], [mH, mM]) > 0) {
+                var tmp = data.tasks[i]
+                data.tasks[i] = data.tasks[j]
+                data.tasks[j] = tmp
+              }
+            }
+          }
+          // 为时间轴配色
+          _this.planTimelineColors(data.tasks)
+          // 刷新界面  
+          _this.setData({
+            lenTasks: data.size,
+            tasks: data.tasks,
+            taskTodo: data.num_todo + memos.length,
+            updateTime: app.globalData.util.currentTime()
+          })
+
         } else {
           api.showError(status)
         }

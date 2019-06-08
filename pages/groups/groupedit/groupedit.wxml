@@ -11,7 +11,7 @@
 <template name='place-capsule'>
   <view class="cu-capsule bg-cyan">
     <view class="cu-tag bg-gray">地点</view>
-    <view class="cu-tag line-white">{{currentPlace.length ? currentPlace : '无'}}</view>
+    <view class="cu-tag line-white">{{group.place.length ? group.place : '无'}}</view>
   </view>
 </template>
 
@@ -39,7 +39,7 @@
         <view class="cu-btn cuIcon-post round lines-cyan" role="button"aria-label=""aria-disabled="false" bindtap='onSaveInfo'>{{groupEditMode?'保存':'编辑'}}</view>
         <view class="cu-btn cuIcon-close round lines-cyan margin-left" role="button"aria-label=""aria-disabled="false" wx:if="{{groupEditMode}}" bindtap='onCloseInfoEdit'></view>
       </view>
-      <template is='place-capsule'/>
+      <template is='place-capsule' data="{{group:currentGroup}}"/>
     </view>
   </form>
 </view> <!--manageGroup-->
@@ -49,7 +49,7 @@
   </view>
   <view class="padding bg-white">
     <view>简介：{{currentGroup.desc.length ? currentGroup.desc : '无'}}</view>
-    <view class='margin-top'><template is='place-capsule'/></view>
+    <view class='margin-top'><template is='place-capsule' data="{{group:currentGroup}}"/></view>
   </view>
 </view>
 
@@ -163,7 +163,7 @@
             </view>
             <view class="cu-form-group">
               <scroll-view scroll-x class="bg-white nav text-center">
-                <view class="cu-item {{0==weekModeCur?'bg-cyan.light cur':''}}" bindtap="onSwitchWeekMode" data-mode="{{0}}">全部</view>
+                <view class="cu-item {{0==weekModeCur?'bg-cyan.light cur':''}}" bindtap="onSwitchWeekMode" data-mode="{{0}}">自由</view>
                 <view class="cu-item {{1==weekModeCur?'bg-cyan.light cur':''}}" bindtap="onSwitchWeekMode" data-mode="{{1}}">单周</view>
                 <view class="cu-item {{2==weekModeCur?'bg-cyan.light cur':''}}" bindtap="onSwitchWeekMode" data-mode="{{2}}">双周</view>
               </scroll-view>
@@ -189,7 +189,7 @@
               <textarea maxlength="100" disabled='{{!showCreateActivity}}'  bindinput="bindActivityDescInput"  value="{{activityDesc}}" placeholder="输入活动描述（100字以内）"></textarea>
             </view>
             <view class="cu-form-group right-align align-center">
-              <template is='place-capsule'/>
+              <template is='place-capsule' data="{{group:currentGroup}}"/>
             </view>
             <view class="padding">
               <button class="cu-btn block bg-blue.light margin-tb-sm lg" bindtap='onUpdateGroup'>{{acitivityEditMode?'修改':'创建'}}</button>

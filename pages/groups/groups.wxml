@@ -188,8 +188,13 @@
     </block>
   </block>
 
-<block wx:if="{{loading[0] || loading[1] || loading[2]}}">
-  <view class="flex flex-direction align-center margin-top">
+<!--
+  同时满足如下两种情况显示指示器
+  1、原本无内容可以显示
+  2、正在拉取数据
+-->
+<block wx:if="{{(lenNearbyGroups==0 && lenAttendedGroups==0) && (loading[0] || loading[1] || loading[2])}}">
+  <view class="flex flex-direction align-center margin-top-lg">
     <w-indicator show color="#1cbbb4" type="catapult" />
     <text class='margin-top'>正在拉取数据...</text>
   </view>

@@ -118,6 +118,9 @@ App({
     canFetchData: false, // 标明子页面可以从服务器拉取数据
     inRelogin: false,
 
+    attendedGroup: false,
+    joinGroupNaviBack: true,
+
     groupedit_currentGroup: null,
     groupedit_manageGroup: false
   }

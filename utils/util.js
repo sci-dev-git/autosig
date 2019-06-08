@@ -44,6 +44,14 @@ module.exports = {
     return (h < 10 ? "0" + h : h) + ':' + (min < 10 ? "0" + min : min) + ':' + (s < 10 ? "0" + s : s);
   },
 
+  currentTimeHM: function () {
+    var now = new Date();
+    var h = now.getHours()
+    var min = now.getMinutes()
+    var s = now.getSeconds()
+    return (h < 10 ? "0" + h : h) + ':' + (min < 10 ? "0" + min : min);
+  },
+
   /**
    * 比较时间大小
    * @param src 二维数组 [hour, minute]
